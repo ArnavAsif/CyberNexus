@@ -1,0 +1,1125 @@
+{%- comment -%}
+=======================================================
+  CYBER HERO SLIDER — sections/cyber-hero.liquid
+  v4 — Silky smooth, zero glitch, clean state machine
+=======================================================
+{%- endcomment -%}
+
+{%- unless section.blocks.size > 0 -%}
+  {%- if request.design_mode -%}
+    <div style="padding:60px 40px;text-align:center;font-family:monospace;color:#dc0f0f;background:#0a0000;border:1px dashed rgba(220,15,15,0.4);">
+      Add at least one <strong>Hero Slide</strong> block to get started.
+    </div>
+  {%- endif -%}
+{%- else -%}
+
+{%- assign slide_blocks = section.blocks | where: 'type', 'slide' -%}
+{%- assign slide_count  = slide_blocks | size -%}
+{%- if slide_count < 10 -%}
+  {%- capture total_fmt -%}0{{ slide_count }}{%- endcapture -%}
+{%- else -%}
+  {%- capture total_fmt -%}{{ slide_count }}{%- endcapture -%}
+{%- endif -%}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Rajdhani:wght@400;600&display=swap"
+  media="print" onload="this.media='all'">
+<noscript>
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Rajdhani:wght@400;600&display=swap">
+</noscript>
+
+<style>
+/* ─────────────────────────────────────────
+   TOKENS
+───────────────────────────────────────── */
+#ch-{{ section.id }} {
+  --cr:       #dc0f0f;
+  --cr-glow:  rgba(220,15,15,.5);
+  --cw:       #fff;
+  --cb:       #0a0000;
+  --fh:       'Orbitron', monospace;
+  --fb:       'Rajdhani', sans-serif;
+  --dur:      600ms;
+  --ease:     cubic-bezier(.4,0,.2,1);
+}
+
+/* ─────────────────────────────────────────
+   WRAPPER
+───────────────────────────────────────── */
+#ch-{{ section.id }} {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  min-height: 600px;
+  overflow: hidden;
+  background: var(--cb);
+  font-family: var(--fb);
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: grab;
+}
+#ch-{{ section.id }}:active { cursor: grabbing; }
+#ch-{{ section.id }} input  { -webkit-user-select: text; user-select: text; }
+#ch-{{ section.id }} img    { pointer-events: none; -webkit-user-drag: none; }
+
+/* ─────────────────────────────────────────
+   TRACK
+───────────────────────────────────────── */
+.ch-track {
+  position: relative;
+  width: 100%; height: 100%;
+}
+
+/* ─────────────────────────────────────────
+   SLIDES  —  pure opacity cross-fade
+   NO translateX on the slide itself.
+   Children handle directional movement.
+───────────────────────────────────────── */
+.ch-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+  /* visibility hidden when fully transparent
+     so hover / focus can't hit invisible slides */
+  visibility: hidden;
+}
+.ch-slide.is-active {
+  opacity: 1;
+  pointer-events: auto;
+  z-index: 3;
+  visibility: visible;
+}
+.ch-slide.is-leaving {
+  opacity: 0;
+  z-index: 2;
+  visibility: visible;
+  pointer-events: none;
+  transition: opacity calc(var(--dur) * .6) var(--ease);
+}
+
+/* ─────────────────────────────────────────
+   BACKGROUND
+───────────────────────────────────────── */
+.ch-bg {
+  position: absolute; inset: 0; z-index: 0;
+}
+.ch-bg::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(circle at 80% 30%, rgba(255,50,50,.18) 0%, transparent 45%),
+    radial-gradient(circle at 20% 75%, rgba(120,0,0,.30) 0%, transparent 40%),
+    radial-gradient(circle at 50%100%, rgba(0,0,0,.55)   0%, transparent 50%);
+  z-index: 1;
+}
+.ch-bg::after {
+  content: '';
+  position: absolute; inset: 0; z-index: 2;
+  pointer-events: none;
+  opacity: .035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ─────────────────────────────────────────
+   WATERMARK
+───────────────────────────────────────── */
+.ch-watermark {
+  position: absolute; inset: 0; z-index: 3;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  pointer-events: none; overflow: hidden;
+}
+.ch-wm-line {
+  font-family: var(--fh);
+  font-size: clamp(72px, 17.5vw, 260px);
+  font-weight: 900;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+  line-height: .88;
+  white-space: nowrap;
+  color: rgba(255,255,255,.065);
+  will-change: transform;
+}
+.ch-wm-line:nth-child(even) { color: rgba(220,15,15,.07); }
+
+/* ─────────────────────────────────────────
+   CONTENT GRID
+───────────────────────────────────────── */
+.ch-content {
+  position: absolute; inset: 0; z-index: 10;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  padding: 0 5.5% 0 6%;
+  height: 100%;
+}
+
+/* ─────────────────────────────────────────
+   LEFT COLUMN
+───────────────────────────────────────── */
+.ch-left {
+  display: flex; flex-direction: column; gap: 22px;
+  position: relative; z-index: 2;
+}
+
+/* ─────────────────────────────────────────
+   ANIMATION SYSTEM
+   ─────────────────────────────────────────
+   Every animatable child defaults to
+   opacity:0 / transform:translateY(20px).
+
+   .is-active  → plays "enter" keyframe once
+   .is-leaving → plays "exit"  keyframe once
+
+   We use animation-fill-mode: forwards so
+   the end state sticks without JS toggling
+   inline styles. No transition conflicts.
+───────────────────────────────────────── */
+
+/* shared defaults */
+.ch-tag,
+.ch-headline,
+.ch-sub,
+.ch-buttons,
+.ch-newsletter {
+  opacity: 0;
+  will-change: opacity, transform;
+}
+
+.ch-char-img {
+  opacity: 0;
+  will-change: opacity, transform;
+}
+
+/* ── ENTER (active slide) ── */
+.ch-slide.is-active .ch-tag       { animation: ch-enter .5s var(--ease) .04s  both; }
+.ch-slide.is-active .ch-headline  { animation: ch-enter-h .6s var(--ease) .12s both; }
+.ch-slide.is-active .ch-sub       { animation: ch-enter .55s var(--ease) .20s both; }
+.ch-slide.is-active .ch-buttons   { animation: ch-enter .55s var(--ease) .28s both; }
+.ch-slide.is-active .ch-newsletter{ animation: ch-enter .55s var(--ease) .36s both; }
+.ch-slide.is-active .ch-char-img  { animation: ch-img-enter .65s var(--ease) .06s both; }
+
+/* ── EXIT (leaving slide) ── */
+.ch-slide.is-leaving .ch-tag       { animation: ch-exit .3s var(--ease) 0s    both; }
+.ch-slide.is-leaving .ch-headline  { animation: ch-exit-h .32s var(--ease) .02s both; }
+.ch-slide.is-leaving .ch-sub       { animation: ch-exit .28s var(--ease) .04s  both; }
+.ch-slide.is-leaving .ch-buttons   { animation: ch-exit .26s var(--ease) .06s  both; }
+.ch-slide.is-leaving .ch-newsletter{ animation: ch-exit .24s var(--ease) .08s  both; }
+.ch-slide.is-leaving .ch-char-img  { animation: ch-img-exit .3s var(--ease) 0s  both; }
+
+/* Float animation — layered AFTER enter on active float images */
+.ch-slide.is-active .ch-char-img.do-float {
+  animation:
+    ch-img-enter .65s var(--ease) .06s both,
+    ch-float 7s ease-in-out .75s infinite;
+}
+
+/* ─────────────────────────────────────────
+   KEYFRAMES
+───────────────────────────────────────── */
+@keyframes ch-enter {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes ch-enter-h {
+  from { opacity: 0; transform: translateY(32px); filter: blur(5px); }
+  to   { opacity: 1; transform: translateY(0);    filter: blur(0); }
+}
+@keyframes ch-exit {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-16px); }
+}
+@keyframes ch-exit-h {
+  from { opacity: 1; transform: translateY(0);     filter: blur(0); }
+  to   { opacity: 0; transform: translateY(-22px); filter: blur(4px); }
+}
+@keyframes ch-img-enter {
+  from { opacity: 0; transform: translateY(28px) scale(.97); filter: blur(3px); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);   filter: blur(0); }
+}
+@keyframes ch-img-exit {
+  from { opacity: 1; transform: translateY(0)     scale(1);   }
+  to   { opacity: 0; transform: translateY(-18px) scale(.97); }
+}
+@keyframes ch-float {
+  0%,100% { transform: translateY(0)     scale(1); }
+  50%     { transform: translateY(-15px) scale(1.007); }
+}
+
+/* ─────────────────────────────────────────
+   TAG
+───────────────────────────────────────── */
+.ch-tag {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--fh); font-size: 10px; font-weight: 600;
+  letter-spacing: .32em; color: var(--cr); text-transform: uppercase;
+}
+.ch-tag::before {
+  content: '';
+  display: block; width: 22px; height: 1.5px;
+  background: var(--cr); box-shadow: 0 0 8px var(--cr-glow);
+  flex-shrink: 0;
+}
+
+/* ─────────────────────────────────────────
+   HEADLINE
+───────────────────────────────────────── */
+.ch-headline {
+  font-family: var(--fh);
+  font-size: clamp(34px, 6.5vw, 96px);
+  font-weight: 900; color: var(--cw);
+  line-height: .93; letter-spacing: -.015em;
+  text-transform: uppercase; margin: 0;
+}
+
+/* ─────────────────────────────────────────
+   SUBTEXT
+───────────────────────────────────────── */
+.ch-sub {
+  font-family: var(--fb);
+  font-size: clamp(14px, 1.6vw, 20px);
+  font-weight: 400; color: rgba(255,255,255,.72);
+  letter-spacing: .02em; max-width: 400px; margin: 0;
+}
+
+/* ─────────────────────────────────────────
+   BUTTONS
+───────────────────────────────────────── */
+.ch-buttons { display: flex; flex-direction: column; gap: 14px; }
+
+.ch-btn-primary {
+  position: relative;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: fit-content; min-width: 240px; padding: 18px 52px;
+  background: var(--cw); color: var(--cb);
+  font-family: var(--fh); font-size: 12.5px; font-weight: 700;
+  letter-spacing: .28em; text-transform: uppercase;
+  text-decoration: none; border: none; cursor: pointer;
+  clip-path: polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px));
+  transition: background .3s, color .3s, box-shadow .3s;
+}
+.ch-btn-primary:hover {
+  background: var(--cr); color: var(--cw);
+  box-shadow: 0 0 30px var(--cr-glow);
+}
+.ch-btn-primary::before {
+  content: '';
+  position: absolute; top: -5px; left: -5px;
+  width: 16px; height: 16px;
+  border-top: 2px solid var(--cr); border-left: 2px solid var(--cr);
+  opacity: 0; transition: opacity .3s;
+}
+.ch-btn-primary:hover::before { opacity: 1; }
+
+.ch-btn-secondary {
+  display: inline-flex; align-items: center; gap: 10px;
+  width: fit-content;
+  font-family: var(--fh); font-size: 10px; font-weight: 600;
+  letter-spacing: .22em; text-transform: uppercase;
+  color: rgba(255,255,255,.62); text-decoration: none;
+  transition: color .3s;
+}
+.ch-btn-secondary:hover { color: var(--cw); }
+.ch-btn-secondary .ch-arrow {
+  width: 30px; height: 30px;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid rgba(255,255,255,.25);
+  transition: border-color .3s, transform .3s;
+}
+.ch-btn-secondary:hover .ch-arrow {
+  border-color: rgba(255,255,255,.7); transform: translateX(5px);
+}
+
+/* ─────────────────────────────────────────
+   NEWSLETTER
+───────────────────────────────────────── */
+.ch-newsletter { display: flex; align-items: stretch; max-width: 380px; }
+.ch-email-input {
+  flex: 1; padding: 15px 20px;
+  background: rgba(255,255,255,.07) !important;
+  border: 1px solid rgba(255,255,255,.18); border-right: none;
+  color: var(--cw); font-family: var(--fb);
+  font-size: 14px; letter-spacing: .04em;
+  outline: none; min-width: 0;
+  transition: border-color .3s, background .3s;
+  -webkit-user-select: text; user-select: text;
+}
+.ch-email-input::placeholder { color: rgba(255,255,255,.38); }
+.ch-email-input:focus {
+  border-color: var(--cr); background: rgba(255,255,255,.11);
+}
+.ch-email-btn {
+  flex-shrink: 0; width: 52px;
+  background: var(--cr); border: 1px solid var(--cr);
+  color: var(--cw); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .3s; outline: none;
+}
+.ch-email-btn:hover { background: #ff1a1a; }
+
+/* ─────────────────────────────────────────
+   RIGHT COLUMN  —  full image, no crop
+───────────────────────────────────────── */
+.ch-right {
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  pointer-events: none;
+  /* let tall images breathe above container */
+  overflow: visible;
+}
+.ch-char-glow {
+  position: absolute; bottom: 5%; left: 50%;
+  transform: translateX(-50%);
+  width: 65%; height: 55%;
+  background: radial-gradient(ellipse, rgba(200,10,10,.38) 0%, transparent 68%);
+  filter: blur(40px); z-index: 1; pointer-events: none;
+}
+.ch-char-shadow {
+  position: absolute; bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 55%; height: 36px;
+  background: radial-gradient(ellipse, rgba(0,0,0,.7) 0%, transparent 70%);
+  filter: blur(18px); z-index: 1; pointer-events: none;
+}
+.ch-char-img {
+  position: relative; z-index: 2;
+  /* full image — no fixed height, max-height guards oversized art */
+  max-height: 93vh;
+  width: auto;
+  max-width: 100%;
+  align-self: flex-end;
+  object-fit: contain;
+  object-position: bottom center;
+  display: block;
+  filter: drop-shadow(0 30px 70px rgba(0,0,0,.45));
+}
+
+/* ─────────────────────────────────────────
+   HUD DECORATIONS
+───────────────────────────────────────── */
+.ch-hud { position: absolute; z-index: 25; pointer-events: none; }
+.ch-hud--topright {
+  top: 18px; right: 72px;
+  display: flex; align-items: center; gap: 8px;
+}
+.ch-hud-segments { display: flex; gap: 3px; align-items: center; }
+.ch-hud-seg { height: 5px; }
+.ch-hud-seg:nth-child(1) { width: 32px; background: rgba(255,255,255,.3); }
+.ch-hud-seg:nth-child(2) { width: 22px; background: rgba(255,255,255,.2); }
+.ch-hud-seg:nth-child(3) { width: 14px; background: rgba(255,255,255,.12); }
+.ch-hud-squares { display: flex; gap: 4px; margin-left: 4px; }
+.ch-hud-sq { width: 8px; height: 8px; background: rgba(220,15,15,.7); }
+.ch-hud-sq:last-child { background: rgba(255,255,255,.15); width: 6px; height: 6px; }
+.ch-hud--corner-tr { top: 72px; right: 72px; }
+.ch-hud--corner-tr svg { color: rgba(220,15,15,.5); }
+.ch-hud--corner-bl { bottom: 40px; left: 24px; }
+.ch-hud--corner-bl svg { color: rgba(220,15,15,.35); }
+
+/* ─────────────────────────────────────────
+   VERTICAL INDICATOR
+───────────────────────────────────────── */
+.ch-vi {
+  position: absolute; right: 26px; top: 50%;
+  transform: translateY(-50%);
+  z-index: 50;
+  display: flex; flex-direction: column; align-items: center;
+}
+.ch-vi-arrow {
+  width: 34px; height: 34px;
+  border: 1px solid rgba(220,15,15,.5);
+  background: rgba(220,15,15,.1);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: rgba(255,255,255,.7);
+  transition: background .3s, border-color .3s, color .3s;
+  -webkit-tap-highlight-color: transparent;
+}
+.ch-vi-arrow:hover {
+  background: var(--cr); border-color: var(--cr); color: var(--cw);
+  box-shadow: 0 0 14px var(--cr-glow);
+}
+.ch-vi-track {
+  width: 1px; height: 100px;
+  background: rgba(255,255,255,.14);
+  position: relative; margin: 10px 0;
+}
+.ch-vi-prog {
+  position: absolute; top: 0; left: 0; width: 100%;
+  background: #ff1a1a;
+  box-shadow: 0 0 10px rgba(255,26,26,.8);
+  transition: height .6s var(--ease);
+}
+.ch-vi-dashes {
+  display: flex; flex-direction: column;
+  gap: 5px; align-items: center; margin: 8px 0;
+}
+.ch-vi-dash {
+  width: 16px; height: 1.5px;
+  background: rgba(255,255,255,.22); transition: all .4s;
+}
+.ch-vi-dash.is-active {
+  width: 22px; height: 2px;
+  background: var(--cr); box-shadow: 0 0 8px var(--cr-glow);
+}
+.ch-vi-dots {
+  display: flex; flex-direction: column;
+  gap: 8px; align-items: center; margin-bottom: 10px;
+}
+.ch-vi-dot {
+  width: 4px; height: 4px;
+  background: rgba(255,255,255,.25);
+  cursor: pointer; transition: all .38s;
+  -webkit-tap-highlight-color: transparent;
+}
+.ch-vi-dot.is-active {
+  height: 18px; background: #ff1a1a;
+  box-shadow: 0 0 10px rgba(255,26,26,.9);
+}
+.ch-vi-dot:hover:not(.is-active) { background: rgba(255,255,255,.6); }
+.ch-vi-num {
+  font-family: var(--fh); font-size: 8.5px;
+  color: rgba(255,255,255,.38);
+  letter-spacing: .12em; text-align: center; margin-top: 6px;
+}
+
+/* ─────────────────────────────────────────
+   SOCIALS
+───────────────────────────────────────── */
+.ch-socials {
+  position: absolute; bottom: 28px; right: 72px;
+  z-index: 25; display: flex; gap: 26px; align-items: center;
+}
+.ch-socials a {
+  font-family: var(--fh); font-size: 10px; font-weight: 600;
+  letter-spacing: .2em; text-transform: uppercase;
+  color: rgba(255,255,255,.5); text-decoration: none;
+  transition: color .3s; white-space: nowrap;
+  pointer-events: auto; cursor: pointer;
+}
+.ch-socials a:hover { color: var(--cw); }
+
+/* ─────────────────────────────────────────
+   MOBILE  ≤ 768px
+───────────────────────────────────────── */
+@media (max-width: 768px) {
+  #ch-{{ section.id }} { min-height: 100svh; height: 100svh; }
+
+  #ch-{{ section.id }} .ch-content {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto;
+    padding: 0; align-items: stretch; height: 100%;
+  }
+  #ch-{{ section.id }} .ch-right {
+    grid-row: 1;
+    height: 52vmax; max-height: 56vh; min-height: 240px;
+    width: 100%; overflow: visible; z-index: 5;
+    display: flex; align-items: flex-end; justify-content: center;
+  }
+  #ch-{{ section.id }} .ch-char-img {
+    max-height: 100%; width: auto; max-width: 86%;
+    object-fit: contain; object-position: bottom center;
+    align-self: flex-end;
+    filter: drop-shadow(0 20px 50px rgba(200,10,10,.45))
+            drop-shadow(0 10px 30px rgba(0,0,0,.6));
+  }
+  #ch-{{ section.id }} .ch-char-glow { width: 90%; height: 60%; bottom: -10%; }
+  #ch-{{ section.id }} .ch-char-shadow { width: 70%; }
+  #ch-{{ section.id }} .ch-left {
+    grid-row: 2; position: relative; z-index: 10;
+    gap: 12px; padding: 20px 22px 80px;
+    background: linear-gradient(
+      to top,
+      rgba(10,0,0,.98) 0%, rgba(10,0,0,.92) 60%,
+      rgba(10,0,0,.60) 85%, transparent 100%
+    );
+    border-top: 1px solid rgba(220,15,15,.3);
+  }
+  #ch-{{ section.id }} .ch-left::before {
+    content: ''; display: block;
+    width: 48px; height: 2px;
+    background: var(--cr); box-shadow: 0 0 10px var(--cr-glow);
+    margin-bottom: 4px;
+  }
+  #ch-{{ section.id }} .ch-headline  { font-size: clamp(28px,9vw,48px); line-height: .95; }
+  #ch-{{ section.id }} .ch-sub       { font-size: 13px; max-width: 100%; color: rgba(255,255,255,.65); }
+  #ch-{{ section.id }} .ch-tag       { font-size: 9px; }
+  #ch-{{ section.id }} .ch-btn-primary   { min-width: unset; width: 100%; padding: 14px 24px; font-size: 10px; }
+  #ch-{{ section.id }} .ch-btn-secondary { font-size: 9px; }
+  #ch-{{ section.id }} .ch-newsletter   { max-width: 100%; }
+  #ch-{{ section.id }} .ch-email-input  { padding: 12px 16px; font-size: 13px; }
+  #ch-{{ section.id }} .ch-wm-line  { font-size: clamp(44px,18vw,90px); }
+  #ch-{{ section.id }} .ch-vi       { right: 8px; top: 45%; }
+  #ch-{{ section.id }} .ch-vi-arrow { width: 28px; height: 28px; }
+  #ch-{{ section.id }} .ch-vi-track { height: 60px; }
+  #ch-{{ section.id }} .ch-socials  { right: 44px; bottom: 12px; gap: 14px; }
+  #ch-{{ section.id }} .ch-hud--topright  { right: 44px; top: 12px; }
+  #ch-{{ section.id }} .ch-hud--corner-tr { right: 44px; top: 52px; }
+  #ch-{{ section.id }} .ch-hud--corner-bl { bottom: 18px; left: 14px; }
+}
+
+@media (max-width: 480px) {
+  #ch-{{ section.id }} .ch-hud--topright,
+  #ch-{{ section.id }} .ch-hud--corner-tr,
+  #ch-{{ section.id }} .ch-hud--corner-bl { display: none; }
+  #ch-{{ section.id }} .ch-socials  { gap: 10px; right: 44px; bottom: 10px; }
+  #ch-{{ section.id }} .ch-socials a { font-size: 8px; }
+  #ch-{{ section.id }} .ch-right    { max-height: 50vh; min-height: 210px; }
+  #ch-{{ section.id }} .ch-char-img { max-width: 90%; }
+  #ch-{{ section.id }} .ch-left     { padding: 16px 18px 70px; }
+  #ch-{{ section.id }} .ch-headline { font-size: clamp(26px,9.5vw,42px); }
+}
+
+/* ─────────────────────────────────────────
+   REDUCED MOTION
+───────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .ch-slide,
+  .ch-slide.is-leaving {
+    transition: opacity .25s ease !important;
+  }
+  .ch-slide.is-active .ch-tag,
+  .ch-slide.is-active .ch-headline,
+  .ch-slide.is-active .ch-sub,
+  .ch-slide.is-active .ch-buttons,
+  .ch-slide.is-active .ch-newsletter,
+  .ch-slide.is-active .ch-char-img,
+  .ch-slide.is-leaving .ch-tag,
+  .ch-slide.is-leaving .ch-headline,
+  .ch-slide.is-leaving .ch-sub,
+  .ch-slide.is-leaving .ch-buttons,
+  .ch-slide.is-leaving .ch-newsletter,
+  .ch-slide.is-leaving .ch-char-img {
+    animation: ch-simple .25s ease both !important;
+  }
+  @keyframes ch-simple {
+    from { opacity: 0; } to { opacity: 1; }
+  }
+  .ch-char-img.do-float { animation: none !important; }
+}
+</style>
+
+<!-- ═══════════════════════════════════════
+     MARKUP
+═══════════════════════════════════════ -->
+<section id="ch-{{ section.id }}" aria-label="Hero slider">
+
+  <!-- HUD -->
+  <div class="ch-hud ch-hud--topright" aria-hidden="true">
+    <div class="ch-hud-segments">
+      <div class="ch-hud-seg"></div>
+      <div class="ch-hud-seg"></div>
+      <div class="ch-hud-seg"></div>
+    </div>
+    <div class="ch-hud-squares">
+      <div class="ch-hud-sq"></div>
+      <div class="ch-hud-sq"></div>
+      <div class="ch-hud-sq"></div>
+    </div>
+  </div>
+  <div class="ch-hud ch-hud--corner-tr" aria-hidden="true">
+    <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
+      <path d="M52 0H22L2 20V52"  stroke="currentColor" stroke-width="1.5" fill="none" opacity=".7"/>
+      <path d="M52 9H26L10 25V52" stroke="currentColor" stroke-width=".6"  fill="none" opacity=".3"/>
+      <rect x="44" y="2"  width="6" height="6" fill="currentColor" opacity=".9"/>
+      <rect x="44" y="11" width="4" height="4" fill="currentColor" opacity=".45"/>
+    </svg>
+  </div>
+  <div class="ch-hud ch-hud--corner-bl" aria-hidden="true">
+    <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+      <path d="M0 48V26L18 8H48"  stroke="currentColor" stroke-width="1.5" fill="none" opacity=".55"/>
+      <path d="M0 40V28L16 12H34" stroke="currentColor" stroke-width=".5"  fill="none" opacity=".25"/>
+    </svg>
+  </div>
+
+  <!-- TRACK -->
+  <div class="ch-track" id="ch-track-{{ section.id }}">
+
+    {%- for block in slide_blocks -%}
+    {%- assign bg_color  = block.settings.bg_color  | default: '#8b0000' -%}
+    {%- assign bg_color2 = block.settings.bg_color2 | default: '#250000' -%}
+
+    <div class="ch-slide{% if forloop.first %} is-active{% endif %}"
+         data-index="{{ forloop.index0 }}"
+         {{ block.shopify_attributes }}>
+
+      <!-- BG -->
+      <div class="ch-bg"
+        style="background:radial-gradient(ellipse 80% 90% at 65% 55%,
+          {{ bg_color }} 0%, {{ bg_color2 }} 38%, #0d0000 72%, #0a0000 100%);">
+      </div>
+
+      <!-- WATERMARK -->
+      {%- if block.settings.watermark_1 != blank
+           or block.settings.watermark_2 != blank
+           or block.settings.watermark_3 != blank -%}
+      <div class="ch-watermark" aria-hidden="true">
+        {%- if block.settings.watermark_1 != blank -%}
+          <div class="ch-wm-line">{{ block.settings.watermark_1 }}</div>
+        {%- endif -%}
+        {%- if block.settings.watermark_2 != blank -%}
+          <div class="ch-wm-line">{{ block.settings.watermark_2 }}</div>
+        {%- endif -%}
+        {%- if block.settings.watermark_3 != blank -%}
+          <div class="ch-wm-line">{{ block.settings.watermark_3 }}</div>
+        {%- endif -%}
+      </div>
+      {%- endif -%}
+
+      <!-- CONTENT -->
+      <div class="ch-content">
+
+        <!-- LEFT -->
+        <div class="ch-left">
+          {%- if block.settings.tag != blank -%}
+            <span class="ch-tag">{{ block.settings.tag }}</span>
+          {%- endif -%}
+          {%- if block.settings.headline != blank -%}
+            <h2 class="ch-headline">{{- block.settings.headline | newline_to_br -}}</h2>
+          {%- endif -%}
+          {%- if block.settings.subtext != blank -%}
+            <p class="ch-sub">{{ block.settings.subtext }}</p>
+          {%- endif -%}
+          <div class="ch-buttons">
+            {%- if block.settings.primary_btn_label != blank -%}
+              <a href="{{ block.settings.primary_btn_url | default: '#' }}"
+                 class="ch-btn-primary">
+                {{ block.settings.primary_btn_label }}
+              </a>
+            {%- endif -%}
+            {%- if block.settings.secondary_btn_label != blank -%}
+              <a href="{{ block.settings.secondary_btn_url | default: '#' }}"
+                 class="ch-btn-secondary">
+                {{ block.settings.secondary_btn_label }}
+                <span class="ch-arrow">
+                  <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+                    <path d="M1 6.5H12M12 6.5L7.5 2M12 6.5L7.5 11"
+                      stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                  </svg>
+                </span>
+              </a>
+            {%- endif -%}
+          </div>
+          {%- if block.settings.show_newsletter -%}
+            <div class="ch-newsletter">
+              <input type="email" class="ch-email-input"
+                placeholder="{{ block.settings.newsletter_placeholder | default: 'Email Address' }}"
+                aria-label="{{ block.settings.newsletter_placeholder | default: 'Email Address' }}">
+              <button class="ch-email-btn" type="button" aria-label="Subscribe">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M1 8H15M15 8L9.5 2.5M15 8L9.5 13.5"
+                    stroke="white" stroke-width="1.4"
+                    stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
+          {%- endif -%}
+        </div>
+
+        <!-- RIGHT -->
+        <div class="ch-right">
+          {%- if block.settings.character_image != blank -%}
+            <div class="ch-char-glow"   aria-hidden="true"></div>
+            <div class="ch-char-shadow" aria-hidden="true"></div>
+            <img
+              src="{{ block.settings.character_image | image_url: width: 1200 }}"
+              srcset="
+                {{ block.settings.character_image | image_url: width: 600  }} 600w,
+                {{ block.settings.character_image | image_url: width: 900  }} 900w,
+                {{ block.settings.character_image | image_url: width: 1200 }} 1200w"
+              sizes="(max-width:768px) 86vw, 50vw"
+              alt="{{ block.settings.character_image.alt | default: 'Character' }}"
+              class="ch-char-img{% if block.settings.enable_float %} do-float{% endif %}"
+              width="{{ block.settings.character_image.width }}"
+              height="{{ block.settings.character_image.height }}"
+              loading="eager" decoding="async" draggable="false">
+          {%- elsif request.design_mode -%}
+            <div style="width:100%;height:100%;display:flex;align-items:center;
+                        justify-content:center;font-family:monospace;
+                        color:rgba(220,15,15,.6);font-size:13px;
+                        text-align:center;padding:20px;">
+              Upload a PNG character<br>image in the Customizer
+            </div>
+          {%- endif -%}
+        </div>
+
+      </div><!-- /ch-content -->
+    </div><!-- /ch-slide -->
+    {%- endfor -%}
+
+  </div><!-- /ch-track -->
+
+  <!-- VERTICAL INDICATOR -->
+  <div class="ch-vi" aria-label="Slide navigation">
+    <button class="ch-vi-arrow" id="ch-prev-{{ section.id }}"
+            aria-label="Previous slide" tabindex="0">
+      <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+        <path d="M5.5 9.5V1.5M1.5 5.5L5.5 1.5L9.5 5.5"
+          stroke="currentColor" stroke-width="1.4"
+          stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <div class="ch-vi-track">
+      <div class="ch-vi-prog" id="ch-prog-{{ section.id }}"
+           style="height:{{ 100 | divided_by: slide_count }}%"></div>
+    </div>
+    <div class="ch-vi-dashes" id="ch-dashes-{{ section.id }}">
+      {%- for block in slide_blocks -%}
+        <div class="ch-vi-dash{% if forloop.first %} is-active{% endif %}"></div>
+      {%- endfor -%}
+    </div>
+    <div class="ch-vi-dots" id="ch-dots-{{ section.id }}">
+      {%- for block in slide_blocks -%}
+        <div class="ch-vi-dot{% if forloop.first %} is-active{% endif %}"
+             data-i="{{ forloop.index0 }}"
+             role="button" tabindex="0"
+             aria-label="Go to slide {{ forloop.index }}">
+        </div>
+      {%- endfor -%}
+    </div>
+    <div class="ch-vi-num" id="ch-num-{{ section.id }}">01 / {{ total_fmt }}</div>
+    <button class="ch-vi-arrow" id="ch-next-{{ section.id }}"
+            aria-label="Next slide" tabindex="0">
+      <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+        <path d="M5.5 1.5V9.5M9.5 5.5L5.5 9.5L1.5 5.5"
+          stroke="currentColor" stroke-width="1.4"
+          stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- SOCIALS -->
+  {%- if section.settings.show_socials -%}
+  <div class="ch-socials">
+    {%- if section.settings.facebook_url  != blank -%}
+      <a href="{{ section.settings.facebook_url  }}" target="_blank" rel="noopener">Facebook</a>
+    {%- endif -%}
+    {%- if section.settings.youtube_url   != blank -%}
+      <a href="{{ section.settings.youtube_url   }}" target="_blank" rel="noopener">YouTube</a>
+    {%- endif -%}
+    {%- if section.settings.instagram_url != blank -%}
+      <a href="{{ section.settings.instagram_url }}" target="_blank" rel="noopener">Insta</a>
+    {%- endif -%}
+  </div>
+  {%- endif -%}
+
+</section>
+
+<script>
+(function () {
+'use strict';
+
+var SID      = '{{ section.id }}';
+var COUNT    = {{ slide_count }};
+var AUTOPLAY = {{ section.settings.autoplay | json }};
+var DELAY    = {{ section.settings.autoplay_delay | times: 1000 | default: 5000 }};
+var TOTAL    = '{{ total_fmt }}';
+
+/* ─── tiny state machine ───────────────────────────────
+   States: IDLE → ANIMATING → IDLE
+   Only one transition runs at a time.
+   Timer IDs are module-scoped — no closure leaks.
+──────────────────────────────────────────────────────── */
+function CyberSlider(wrap) {
+  var self      = this;
+  self.wrap     = wrap;
+  self.track    = wrap.querySelector('#ch-track-' + SID);
+  self.slides   = Array.from(self.track.querySelectorAll('.ch-slide'));
+  self.cur      = 0;
+  self.busy     = false;
+  self.autoTmr  = null;
+  self.cleanTmr = null;
+
+  /* UI */
+  self.progEl  = wrap.querySelector('#ch-prog-'   + SID);
+  self.numEl   = wrap.querySelector('#ch-num-'    + SID);
+  self.dotWrap = wrap.querySelector('#ch-dots-'   + SID);
+  self.dshWrap = wrap.querySelector('#ch-dashes-' + SID);
+
+  if (!self.slides.length) return;
+  self._bindEvents();
+  self._updateUI(0);
+  self._startAuto();
+}
+
+/* ── go to slide ───────────────────────────────────── */
+CyberSlider.prototype.goto = function (next) {
+  var self = this;
+  if (self.busy || COUNT <= 1) return;
+  next = ((next % COUNT) + COUNT) % COUNT;
+  if (next === self.cur) return;
+
+  self.busy = true;
+  clearTimeout(self.cleanTmr);
+
+  var leaving  = self.slides[self.cur];
+  var entering = self.slides[next];
+
+  /*
+    1. Snapshot computed opacity of every animated child
+       on the LEAVING slide so their exit starts from
+       wherever they currently are, not from opacity:0.
+       We do this by temporarily removing the animation
+       class, reading the value, then re-applying.
+       → avoids the "flash to 0 then animate up" glitch.
+  */
+
+  /* 2. Tag the leaving slide — CSS exit keyframes fire */
+  leaving.classList.add('is-leaving');
+  leaving.classList.remove('is-active');
+
+  /*
+    3. Reset the entering slide completely before
+       adding is-active so CSS enter keyframes always
+       start from the correct `from` state.
+       We must do a reflow between remove and add.
+  */
+  entering.classList.remove('is-active', 'is-leaving');
+  /* force reflow — tells browser to clear animation state */
+  entering.getBoundingClientRect();
+  /* now add active — enter animations begin fresh */
+  entering.classList.add('is-active');
+
+  self.cur = next;
+  self._updateUI(next);
+
+  /* 4. Clean up leaving slide after its exit finishes */
+  self.cleanTmr = setTimeout(function () {
+    leaving.classList.remove('is-leaving');
+    self.busy = false;
+  }, 420); /* slightly longer than longest exit anim (.3s + .08s delay) */
+};
+
+/* ── autoplay ──────────────────────────────────────── */
+CyberSlider.prototype._startAuto = function () {
+  var self = this;
+  if (!AUTOPLAY || COUNT <= 1) return;
+  clearInterval(self.autoTmr);
+  self.autoTmr = setInterval(function () {
+    self.goto(self.cur + 1);
+  }, DELAY);
+};
+CyberSlider.prototype._stopAuto = function () {
+  clearInterval(this.autoTmr);
+};
+
+/* ── UI indicator ──────────────────────────────────── */
+CyberSlider.prototype._updateUI = function (i) {
+  var self = this;
+  if (self.progEl)
+    self.progEl.style.height = (((i + 1) / COUNT) * 100) + '%';
+  if (self.numEl)
+    self.numEl.textContent = String(i + 1).padStart(2, '0') + ' / ' + TOTAL;
+  if (self.dotWrap)
+    self.dotWrap.querySelectorAll('.ch-vi-dot').forEach(function (d, j) {
+      d.classList.toggle('is-active', j === i);
+    });
+  if (self.dshWrap)
+    self.dshWrap.querySelectorAll('.ch-vi-dash').forEach(function (d, j) {
+      d.classList.toggle('is-active', j === i);
+    });
+};
+
+/* ── events ────────────────────────────────────────── */
+CyberSlider.prototype._bindEvents = function () {
+  var self = this;
+  var wrap = self.wrap;
+
+  /* pause on hover */
+  wrap.addEventListener('mouseenter', function () { self._stopAuto(); });
+  wrap.addEventListener('mouseleave', function () { self._startAuto(); });
+
+  /* prev / next buttons */
+  var prevBtn = wrap.querySelector('#ch-prev-' + SID);
+  var nextBtn = wrap.querySelector('#ch-next-' + SID);
+  if (prevBtn) prevBtn.addEventListener('click', function () {
+    self._stopAuto(); self.goto(self.cur - 1); self._startAuto();
+  });
+  if (nextBtn) nextBtn.addEventListener('click', function () {
+    self._stopAuto(); self.goto(self.cur + 1); self._startAuto();
+  });
+
+  /* dot navigation */
+  if (self.dotWrap) {
+    self.dotWrap.querySelectorAll('.ch-vi-dot').forEach(function (d) {
+      d.addEventListener('click', function () {
+        self._stopAuto();
+        self.goto(parseInt(d.dataset.i, 10));
+        self._startAuto();
+      });
+    });
+  }
+
+  /* touch swipe */
+  var tsX, tsY, swiping = false;
+  wrap.addEventListener('touchstart', function (e) {
+    tsX = e.touches[0].clientX;
+    tsY = e.touches[0].clientY;
+    swiping = false;
+  }, { passive: true });
+  wrap.addEventListener('touchmove', function (e) {
+    if (Math.abs(e.touches[0].clientX - tsX) >
+        Math.abs(e.touches[0].clientY - tsY)) swiping = true;
+  }, { passive: true });
+  wrap.addEventListener('touchend', function (e) {
+    if (!swiping) return;
+    var dx = e.changedTouches[0].clientX - tsX;
+    if (Math.abs(dx) < 40) return;
+    self._stopAuto();
+    self.goto(dx < 0 ? self.cur + 1 : self.cur - 1);
+    self._startAuto();
+  });
+
+  /* mouse drag */
+  var mdX = null;
+  wrap.addEventListener('mousedown', function (e) { mdX = e.clientX; },
+    { passive: true });
+  wrap.addEventListener('mouseup', function (e) {
+    if (mdX === null) return;
+    var dx = e.clientX - mdX; mdX = null;
+    if (Math.abs(dx) < 50) return;
+    self._stopAuto();
+    self.goto(dx < 0 ? self.cur + 1 : self.cur - 1);
+    self._startAuto();
+  });
+
+  /* keyboard */
+  document.addEventListener('keydown', function (e) {
+    var r = wrap.getBoundingClientRect();
+    if (r.bottom < 0 || r.top > window.innerHeight) return;
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')
+      { self._stopAuto(); self.goto(self.cur - 1); self._startAuto(); }
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown')
+      { self._stopAuto(); self.goto(self.cur + 1); self._startAuto(); }
+  });
+
+  /* parallax */
+  var noMotion = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var mobile   = window.matchMedia('(max-width:768px)').matches;
+  if (!noMotion && !mobile) {
+    wrap.addEventListener('mousemove', function (e) {
+      var s = self.slides[self.cur];
+      if (!s) return;
+      var r  = wrap.getBoundingClientRect();
+      var xf = (e.clientX - r.left) / r.width  - .5;
+      var yf = (e.clientY - r.top)  / r.height - .5;
+      s.querySelectorAll('.ch-wm-line').forEach(function (l, i) {
+        l.style.transform =
+          'translate(' + xf * (i % 2 ? -18 : 18) + 'px,' +
+                         yf * (i % 2 ?  -8 :  8) + 'px)';
+      });
+      var img = s.querySelector('.ch-char-img:not(.do-float)');
+      if (img)
+        img.style.transform =
+          'translate(' + xf * -10 + 'px,' + yf * -6 + 'px)';
+    }, { passive: true });
+
+    wrap.addEventListener('mouseleave', function () {
+      var s = self.slides[self.cur];
+      if (!s) return;
+      s.querySelectorAll('.ch-wm-line').forEach(function (l) {
+        l.style.transform = '';
+      });
+      var img = s.querySelector('.ch-char-img:not(.do-float)');
+      if (img) img.style.transform = '';
+    });
+  }
+};
+
+/* ─── boot ─────────────────────────────────────────── */
+function boot() {
+  var el = document.getElementById('ch-' + SID);
+  if (el) new CyberSlider(el);
+}
+
+if (document.readyState === 'loading')
+  document.addEventListener('DOMContentLoaded', boot);
+else
+  boot();
+
+if (window.Shopify && Shopify.designMode)
+  document.addEventListener('shopify:section:load', function (e) {
+    if (e.detail.sectionId === SID) boot();
+  });
+
+})();
+</script>
+
+{%- endunless -%}
+
+{% schema %}
+{
+  "name": "Cyber Hero Slider",
+  "tag": "div",
+  "class": "cyber-hero-wrapper",
+  "settings": [
+    { "type": "header",   "content": "Autoplay" },
+    { "type": "checkbox", "id": "autoplay",       "label": "Enable autoplay",  "default": true },
+    { "type": "range",    "id": "autoplay_delay", "label": "Autoplay delay",
+      "min": 3, "max": 12, "step": 1, "unit": "s", "default": 5 },
+    { "type": "header",   "content": "Social Links" },
+    { "type": "checkbox", "id": "show_socials",   "label": "Show social links","default": true },
+    { "type": "url", "id": "facebook_url",  "label": "Facebook URL"  },
+    { "type": "url", "id": "youtube_url",   "label": "YouTube URL"   },
+    { "type": "url", "id": "instagram_url", "label": "Instagram URL" }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Hero Slide",
+      "settings": [
+        { "type": "header", "content": "Background Colors" },
+        { "type": "color", "id": "bg_color",  "label": "Highlight Color", "default": "#cc0000" },
+        { "type": "color", "id": "bg_color2", "label": "Mid Color",       "default": "#4a0000" },
+        { "type": "header", "content": "Character" },
+        { "type": "image_picker", "id": "character_image", "label": "Character Image",
+          "info": "PNG with transparent background recommended." },
+        { "type": "checkbox", "id": "enable_float", "label": "Floating animation", "default": true },
+        { "type": "header", "content": "Text" },
+        { "type": "text",     "id": "tag",      "label": "Tag / Badge",    "default": "NEW SEASON"              },
+        { "type": "textarea", "id": "headline", "label": "Headline",        "default": "WELCOME\nTO THE\nFUTURE" },
+        { "type": "text",     "id": "subtext",  "label": "Supporting Text", "default": "Join now and discover more." },
+        { "type": "header", "content": "Primary Button" },
+        { "type": "text", "id": "primary_btn_label", "label": "Label", "default": "EXPLORE" },
+        { "type": "url",  "id": "primary_btn_url",   "label": "Link"  },
+        { "type": "header", "content": "Secondary Button" },
+        { "type": "text", "id": "secondary_btn_label", "label": "Label", "default": "Learn More" },
+        { "type": "url",  "id": "secondary_btn_url",   "label": "Link"  },
+        { "type": "header", "content": "Newsletter" },
+        { "type": "checkbox", "id": "show_newsletter",       "label": "Show email input", "default": true  },
+        { "type": "text",    "id": "newsletter_placeholder", "label": "Placeholder",      "default": "Email Address" },
+        { "type": "header", "content": "Watermark" },
+        { "type": "text", "id": "watermark_1", "label": "Line 1", "default": "WELCOME" },
+        { "type": "text", "id": "watermark_2", "label": "Line 2", "default": "TO THE"  },
+        { "type": "text", "id": "watermark_3", "label": "Line 3", "default": "FUTURE"  }
+      ]
+    }
+  ],
+  "presets": [{
+    "name": "Cyber Hero Slider",
+    "blocks": [{
+      "type": "slide",
+      "settings": {
+        "bg_color": "#cc0000", "bg_color2": "#4a0000",
+        "enable_float": true,
+        "tag": "NEW SEASON",
+        "headline": "WELCOME\nTO THE\nFUTURE",
+        "subtext": "Join now and discover more.",
+        "primary_btn_label": "EXPLORE",
+        "secondary_btn_label": "Learn More",
+        "show_newsletter": true,
+        "newsletter_placeholder": "Email Address",
+        "watermark_1": "WELCOME",
+        "watermark_2": "TO THE",
+        "watermark_3": "FUTURE"
+      }
+    }]
+  }]
+}
+{% endschema %}

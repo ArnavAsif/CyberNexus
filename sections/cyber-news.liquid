@@ -1,0 +1,784 @@
+{%- comment -%}
+=======================================================
+  CYBER NEWS — sections/cyber-news.liquid
+  Light bg, left headline+btn, right blog card grid
+  Pulls from real Shopify blog OR manual blocks
+=======================================================
+{%- endcomment -%}
+
+<style>
+/* ══════════════════════════════════════════════════════
+   TOKENS
+══════════════════════════════════════════════════════ */
+#cnw-{{ section.id }} {
+  --cr:      #dc0f0f;
+  --cr-glow: rgba(220,15,15,.4);
+  --cdark:   #0d0d0d;
+  --cbg:     #f0f0f0;
+  --ccard:   #ffffff;
+  --cgray:   rgba(20,20,20,.55);
+  --cgray2:  rgba(20,20,20,.35);
+  --cborder: rgba(0,0,0,.07);
+  --fh:      'Orbitron', monospace;
+  --fb:      'Rajdhani', sans-serif;
+  --ease:    cubic-bezier(.16,1,.3,1);
+}
+
+/* ══════════════════════════════════════════════════════
+   SECTION
+══════════════════════════════════════════════════════ */
+#cnw-{{ section.id }} {
+  position: relative;
+  width: 100%;
+  background: var(--cbg);
+  font-family: var(--fb);
+  overflow: hidden;
+  padding: 80px 0 90px;
+}
+
+/* top + bottom red lines */
+#cnw-{{ section.id }}::before,
+#cnw-{{ section.id }}::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(220,15,15,.5) 20%,
+    rgba(220,15,15,1)  50%,
+    rgba(220,15,15,.5) 80%,
+    transparent 100%
+  );
+  z-index: 3; pointer-events: none;
+}
+#cnw-{{ section.id }}::before { top: 0; }
+#cnw-{{ section.id }}::after  { bottom: 0; }
+
+/* grid texture */
+#cnw-{{ section.id }} .cnw-grid-bg {
+  position: absolute; inset: 0; z-index: 0;
+  pointer-events: none; opacity: .022;
+  background-image:
+    linear-gradient(rgba(220,15,15,1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(220,15,15,1) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+/* ══════════════════════════════════════════════════════
+   INNER LAYOUT
+══════════════════════════════════════════════════════ */
+.cnw-inner {
+  position: relative; z-index: 2;
+  max-width: 1760px;
+  margin: 0 auto;
+  padding: 0 60px;
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 64px;
+  align-items: start;
+}
+
+/* ══════════════════════════════════════════════════════
+   LEFT COLUMN
+══════════════════════════════════════════════════════ */
+.cnw-left {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: sticky;
+  top: 40px;
+}
+
+/* vertical red bar */
+.cnw-left::before {
+  content: '';
+  position: absolute;
+  left: -22px; top: 8%; bottom: 8%;
+  width: 2px;
+  background: linear-gradient(to bottom, transparent, var(--cr) 40%, var(--cr) 60%, transparent);
+  opacity: .45;
+}
+
+/* tag */
+.cnw-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--fh);
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--cr);
+}
+.cnw-tag::before {
+  content: '';
+  width: 18px; height: 1.5px;
+  background: var(--cr);
+  box-shadow: 0 0 7px var(--cr-glow);
+  flex-shrink: 0;
+}
+
+/* headline */
+.cnw-headline {
+  font-family: var(--fh);
+  font-size: clamp(24px, 2.8vw, 40px);
+  font-weight: 900;
+  line-height: 1.0;
+  letter-spacing: -.01em;
+  text-transform: uppercase;
+  color: var(--cdark);
+  margin: 0;
+}
+.cnw-headline .red {
+  color: var(--cr);
+  display: block;
+  text-shadow: 0 0 30px rgba(220,15,15,.15);
+}
+
+/* button */
+.cnw-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: fit-content;
+  padding: 13px 26px;
+  background: transparent;
+  color: var(--cr);
+  font-family: var(--fh);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: 1.5px solid var(--cr);
+  cursor: pointer;
+  clip-path: polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));
+  transition: background .3s, color .3s, box-shadow .3s;
+  margin-top: 6px;
+}
+.cnw-btn:hover {
+  background: var(--cr);
+  color: #fff;
+  box-shadow: 0 0 22px var(--cr-glow);
+}
+.cnw-btn svg { flex-shrink: 0; transition: transform .3s; }
+.cnw-btn:hover svg { transform: translateX(4px); }
+
+/* ══════════════════════════════════════════════════════
+   RIGHT — CARDS GRID
+══════════════════════════════════════════════════════ */
+.cnw-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+/* ── CARD ── */
+.cnw-card {
+  position: relative;
+  background: var(--ccard);
+  border: 1px solid var(--cborder);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: box-shadow .35s, transform .35s var(--ease);
+  cursor: pointer;
+  text-decoration: none;
+}
+.cnw-card:hover {
+  box-shadow:
+    0 16px 48px rgba(0,0,0,.12),
+    0 0 0 1px rgba(220,15,15,.2);
+  transform: translateY(-4px);
+}
+
+/* top red line on hover */
+.cnw-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--cr);
+  box-shadow: 0 0 10px var(--cr-glow);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .4s var(--ease);
+  z-index: 3;
+}
+.cnw-card:hover::before { transform: scaleX(1); }
+
+/* ── IMAGE ── */
+.cnw-card-img-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #111;
+  flex-shrink: 0;
+}
+.cnw-card-img-wrap img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform .55s var(--ease), filter .55s;
+  filter: saturate(1);
+}
+.cnw-card:hover .cnw-card-img-wrap img {
+  transform: scale(1.06);
+  filter: saturate(1.15) brightness(1.05);
+}
+
+/* image overlay */
+.cnw-card-img-wrap::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 50%,
+    rgba(0,0,0,.35) 100%
+  );
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* category badge on image */
+.cnw-card-cat {
+  position: absolute;
+  top: 10px; left: 10px;
+  z-index: 2;
+  font-family: var(--fh);
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--cr);
+  padding: 3px 9px;
+  clip-path: polygon(0 0,calc(100% - 5px) 0,100% 5px,100% 100%,5px 100%,0 calc(100% - 5px));
+}
+
+/* placeholder when no image */
+.cnw-card-img-placeholder {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at 30% 40%, rgba(220,15,15,.25) 0%, transparent 60%),
+    #1a0608;
+  display: flex; align-items: center; justify-content: center;
+}
+.cnw-card-img-placeholder svg { opacity: .2; }
+
+/* ── BODY ── */
+.cnw-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px 20px 18px;
+  flex: 1;
+}
+
+/* date */
+.cnw-card-date {
+  font-family: var(--fh);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--cgray2);
+}
+
+/* title */
+.cnw-card-title {
+  font-family: var(--fb);
+  font-size: clamp(15px, 1.4vw, 18px);
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--cdark);
+  margin: 0;
+  transition: color .28s;
+}
+.cnw-card:hover .cnw-card-title { color: var(--cr); }
+
+/* excerpt */
+.cnw-card-excerpt {
+  font-family: var(--fb);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--cgray);
+  margin: 0;
+  /* clamp to 2 lines */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex: 1;
+}
+
+/* read more */
+.cnw-card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--fh);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--cr);
+  text-decoration: none;
+  margin-top: 4px;
+  transition: gap .3s var(--ease);
+}
+.cnw-card-link svg { flex-shrink: 0; transition: transform .3s var(--ease); }
+.cnw-card:hover .cnw-card-link { gap: 12px; }
+.cnw-card:hover .cnw-card-link svg { transform: translateX(4px); }
+
+/* ══════════════════════════════════════════════════════
+   SCROLL REVEAL
+══════════════════════════════════════════════════════ */
+.cnw-reveal {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity .65s var(--ease), transform .65s var(--ease);
+}
+.cnw-reveal.cnw-fl { transform: translateX(-26px); }
+.cnw-reveal.in-view { opacity: 1; transform: translate(0,0); }
+.cnw-d1 { transition-delay: .04s; }
+.cnw-d2 { transition-delay: .10s; }
+.cnw-d3 { transition-delay: .08s; }
+.cnw-d4 { transition-delay: .16s; }
+.cnw-d5 { transition-delay: .24s; }
+
+/* ══════════════════════════════════════════════════════
+   TABLET ≤ 1024px
+══════════════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .cnw-inner {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    padding: 0 40px;
+  }
+  .cnw-left { position: static; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 16px 32px; }
+  .cnw-left::before { display: none; }
+  .cnw-headline { font-size: clamp(22px, 5vw, 34px); }
+  .cnw-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; }
+}
+
+/* ══════════════════════════════════════════════════════
+   TABLET ≤ 768px
+══════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  #cnw-{{ section.id }} { padding: 60px 0 70px; }
+  .cnw-inner { padding: 0 22px; gap: 32px; }
+  .cnw-grid  { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ══════════════════════════════════════════════════════
+   MOBILE ≤ 500px
+══════════════════════════════════════════════════════ */
+@media (max-width: 500px) {
+  .cnw-grid { grid-template-columns: 1fr; }
+  .cnw-inner { padding: 0 16px; }
+}
+
+/* ══════════════════════════════════════════════════════
+   REDUCED MOTION
+══════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .cnw-reveal { opacity: 1; transform: none; transition: none; }
+  .cnw-card   { transition: none; }
+  .cnw-card-img-wrap img { transition: none; }
+  .cnw-card::before { transition: none; }
+}
+</style>
+
+<section id="cnw-{{ section.id }}" aria-label="News & Updates">
+  <div class="cnw-grid-bg" aria-hidden="true"></div>
+
+  <div class="cnw-inner">
+
+    <!-- ══ LEFT ══ -->
+    <div class="cnw-left">
+
+      {%- if section.settings.tag != blank -%}
+        <span class="cnw-tag cnw-reveal cnw-fl cnw-d1">
+          {{ section.settings.tag }}
+        </span>
+      {%- endif -%}
+
+      {%- if section.settings.headline != blank -%}
+        <h2 class="cnw-headline cnw-reveal cnw-fl cnw-d2">
+          {{- section.settings.headline | newline_to_br -}}
+        </h2>
+      {%- endif -%}
+
+      {%- if section.settings.btn_label != blank -%}
+        <a href="{{ section.settings.btn_url | default: '#' }}"
+           class="cnw-btn cnw-reveal cnw-fl cnw-d2">
+          {{ section.settings.btn_label }}
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M1 6H11M11 6L7 2M11 6L7 10"
+              stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </a>
+      {%- endif -%}
+
+    </div>
+
+    <!-- ══ RIGHT — CARDS ══ -->
+    <div class="cnw-grid">
+
+      {%- comment -%}
+        Priority: manual blocks → Shopify blog articles
+      {%- endcomment -%}
+
+      {%- assign manual_blocks = section.blocks | where: 'type', 'news_item' -%}
+
+      {%- if manual_blocks.size > 0 -%}
+        {%- comment -%} MANUAL BLOCKS MODE {%- endcomment -%}
+        {%- for block in manual_blocks -%}
+          {%- assign di = forloop.index | plus: 2 -%}
+          {%- if di > 5 -%}{%- assign di = 5 -%}{%- endif -%}
+
+          <article class="cnw-card cnw-reveal cnw-d{{ di }}"
+                   {{ block.shopify_attributes }}>
+
+            <!-- IMAGE -->
+            <div class="cnw-card-img-wrap">
+              {%- if block.settings.card_image != blank -%}
+                <img
+                  src="{{ block.settings.card_image | image_url: width: 800 }}"
+                  srcset="
+                    {{ block.settings.card_image | image_url: width: 400 }} 400w,
+                    {{ block.settings.card_image | image_url: width: 800 }} 800w"
+                  sizes="(max-width:768px) 90vw, 33vw"
+                  alt="{{ block.settings.card_image.alt | default: block.settings.title }}"
+                  loading="lazy" draggable="false">
+              {%- else -%}
+                <div class="cnw-card-img-placeholder">
+                  <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                    <rect x="4" y="4" width="40" height="40" rx="4"
+                          stroke="rgba(220,15,15,.8)" stroke-width="1.5"/>
+                    <path d="M4 32l12-10 8 8 8-14 12 16"
+                          stroke="rgba(220,15,15,.8)" stroke-width="1.5"
+                          stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="16" cy="16" r="4"
+                            stroke="rgba(220,15,15,.8)" stroke-width="1.5"/>
+                  </svg>
+                </div>
+              {%- endif -%}
+              {%- if block.settings.category != blank -%}
+                <span class="cnw-card-cat">{{ block.settings.category }}</span>
+              {%- endif -%}
+            </div>
+
+            <!-- BODY -->
+            <div class="cnw-card-body">
+              {%- if block.settings.date != blank -%}
+                <time class="cnw-card-date">{{ block.settings.date }}</time>
+              {%- endif -%}
+              {%- if block.settings.title != blank -%}
+                <h3 class="cnw-card-title">{{ block.settings.title }}</h3>
+              {%- endif -%}
+              {%- if block.settings.excerpt != blank -%}
+                <p class="cnw-card-excerpt">{{ block.settings.excerpt }}</p>
+              {%- endif -%}
+              {%- if block.settings.link_label != blank -%}
+                <a href="{{ block.settings.link_url | default: '#' }}"
+                   class="cnw-card-link" tabindex="-1">
+                  {{ block.settings.link_label }}
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                    <path d="M1 6H11M11 6L7 2M11 6L7 10"
+                      stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </a>
+              {%- endif -%}
+            </div>
+
+            <!-- make whole card clickable -->
+            {%- if block.settings.link_url != blank -%}
+              <a href="{{ block.settings.link_url }}"
+                 class="cnw-card-overlay-link"
+                 aria-label="{{ block.settings.title }}"
+                 style="position:absolute;inset:0;z-index:2;"></a>
+            {%- endif -%}
+
+          </article>
+        {%- endfor -%}
+
+      {%- elsif section.settings.blog != blank -%}
+        {%- comment -%} SHOPIFY BLOG MODE {%- endcomment -%}
+        {%- assign blog_handle = section.settings.blog -%}
+        {%- assign articles    = blogs[blog_handle].articles
+                               | slice: 0, section.settings.posts_count -%}
+
+        {%- for article in articles -%}
+          {%- assign di = forloop.index | plus: 2 -%}
+          {%- if di > 5 -%}{%- assign di = 5 -%}{%- endif -%}
+
+          <article class="cnw-card cnw-reveal cnw-d{{ di }}">
+
+            <!-- IMAGE -->
+            <div class="cnw-card-img-wrap">
+              {%- if article.image != blank -%}
+                <img
+                  src="{{ article.image | image_url: width: 800 }}"
+                  srcset="
+                    {{ article.image | image_url: width: 400 }} 400w,
+                    {{ article.image | image_url: width: 800 }} 800w"
+                  sizes="(max-width:768px) 90vw, 33vw"
+                  alt="{{ article.image.alt | default: article.title }}"
+                  loading="lazy" draggable="false">
+              {%- else -%}
+                <div class="cnw-card-img-placeholder">
+                  <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                    <rect x="4" y="4" width="40" height="40" rx="4"
+                          stroke="rgba(220,15,15,.8)" stroke-width="1.5"/>
+                    <path d="M4 32l12-10 8 8 8-14 12 16"
+                          stroke="rgba(220,15,15,.8)" stroke-width="1.5"
+                          stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="16" cy="16" r="4"
+                            stroke="rgba(220,15,15,.8)" stroke-width="1.5"/>
+                  </svg>
+                </div>
+              {%- endif -%}
+              {%- if article.tags.first != blank -%}
+                <span class="cnw-card-cat">{{ article.tags.first }}</span>
+              {%- endif -%}
+            </div>
+
+            <!-- BODY -->
+            <div class="cnw-card-body">
+              <time class="cnw-card-date"
+                    datetime="{{ article.published_at | date: '%Y-%m-%d' }}">
+                {{ article.published_at | date: '%b %d, %Y' | upcase }}
+              </time>
+              <h3 class="cnw-card-title">{{ article.title }}</h3>
+              {%- if article.excerpt_or_content != blank -%}
+                <p class="cnw-card-excerpt">
+                  {{ article.excerpt_or_content | strip_html | truncate: 110 }}
+                </p>
+              {%- endif -%}
+              <a href="{{ article.url }}" class="cnw-card-link" tabindex="-1">
+                {{ section.settings.read_more_label | default: 'READ MORE' }}
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                  <path d="M1 6H11M11 6L7 2M11 6L7 10"
+                    stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </a>
+            </div>
+
+            <!-- full card link -->
+            <a href="{{ article.url }}"
+               class="cnw-card-overlay-link"
+               aria-label="{{ article.title }}"
+               style="position:absolute;inset:0;z-index:2;"></a>
+
+          </article>
+        {%- endfor -%}
+
+      {%- elsif request.design_mode -%}
+        <div style="grid-column:1/-1;padding:48px;text-align:center;
+                    font-family:monospace;color:rgba(220,15,15,.6);font-size:13px;
+                    border:1px dashed rgba(220,15,15,.3);">
+          Add <strong>News Item</strong> blocks, or select a Blog in section settings.
+        </div>
+      {%- endif -%}
+
+    </div><!-- /grid -->
+
+  </div><!-- /inner -->
+</section>
+
+<script>
+(function () {
+'use strict';
+var SID = '{{ section.id }}';
+
+function boot() {
+  var section = document.getElementById('cnw-' + SID);
+  if (!section) return;
+
+  /* ── SCROLL REVEAL ── */
+  var items = section.querySelectorAll('.cnw-reveal');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) {
+          en.target.classList.add('in-view');
+          io.unobserve(en.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+    items.forEach(function (el) { io.observe(el); });
+  } else {
+    items.forEach(function (el) { el.classList.add('in-view'); });
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', boot);
+} else {
+  boot();
+}
+if (window.Shopify && Shopify.designMode) {
+  document.addEventListener('shopify:section:load', function (e) {
+    if (e.detail.sectionId === SID) boot();
+  });
+}
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Cyber News",
+  "tag": "div",
+  "class": "cyber-news-wrapper",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Left Column"
+    },
+    {
+      "type": "text",
+      "id": "tag",
+      "label": "Tag / Badge",
+      "default": "Latest News"
+    },
+    {
+      "type": "textarea",
+      "id": "headline",
+      "label": "Headline",
+      "info": "Use <em class=\"red\">TEXT</em> on a new line to make it red.",
+      "default": "NEWS &\n<em class=\"red\">UPDATES</em>"
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "VIEW ALL NEWS"
+    },
+    {
+      "type": "url",
+      "id": "btn_url",
+      "label": "Button Link"
+    },
+    {
+      "type": "header",
+      "content": "Blog Source (auto-pull articles)"
+    },
+    {
+      "type": "blog",
+      "id": "blog",
+      "label": "Blog",
+      "info": "Select a Shopify blog to auto-pull articles. Ignored if News Item blocks are added."
+    },
+    {
+      "type": "range",
+      "id": "posts_count",
+      "label": "Number of posts to show",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "text",
+      "id": "read_more_label",
+      "label": "Read More Label",
+      "default": "READ MORE"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "news_item",
+      "name": "News Item",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "card_image",
+          "label": "Card Image",
+          "info": "16:9 ratio recommended."
+        },
+        {
+          "type": "text",
+          "id": "category",
+          "label": "Category Badge",
+          "default": "UPDATE"
+        },
+        {
+          "type": "text",
+          "id": "date",
+          "label": "Date",
+          "default": "MAY 15, 2025"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "New Season: Rise of Nexus"
+        },
+        {
+          "type": "textarea",
+          "id": "excerpt",
+          "label": "Excerpt",
+          "default": "Prepare for new challenges, rewards, and battles."
+        },
+        {
+          "type": "text",
+          "id": "link_label",
+          "label": "Link Label",
+          "default": "READ MORE"
+        },
+        {
+          "type": "url",
+          "id": "link_url",
+          "label": "Link URL"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Cyber News",
+      "blocks": [
+        {
+          "type": "news_item",
+          "settings": {
+            "category": "SEASON",
+            "date": "MAY 15, 2025",
+            "title": "New Season: Rise of Nexus",
+            "excerpt": "Prepare for new challenges, rewards, and battles.",
+            "link_label": "READ MORE"
+          }
+        },
+        {
+          "type": "news_item",
+          "settings": {
+            "category": "MAINTENANCE",
+            "date": "MAY 10, 2025",
+            "title": "Maintenance Complete",
+            "excerpt": "All servers are back online and better than ever.",
+            "link_label": "READ MORE"
+          }
+        },
+        {
+          "type": "news_item",
+          "settings": {
+            "category": "EVENT",
+            "date": "MAY 05, 2025",
+            "title": "PvP Tournament Announced",
+            "excerpt": "Join the ultimate battle and win exclusive rewards.",
+            "link_label": "READ MORE"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

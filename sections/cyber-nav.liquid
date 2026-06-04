@@ -1,0 +1,497 @@
+{%- comment -%}
+=======================================================
+  CYBER NAV — sections/cyber-nav.liquid
+  Upload to: /sections/cyber-nav.liquid
+  Add to your theme layout or via Customizer
+=======================================================
+{%- endcomment -%}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  /* =============================================
+     NAVBAR
+     ============================================= */
+  #cyber-nav-{{ section.id }} {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    padding: 22px 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition:
+      background 0.55s ease,
+      backdrop-filter 0.55s ease,
+      -webkit-backdrop-filter 0.55s ease,
+      padding 0.4s ease,
+      border-color 0.55s ease,
+      box-shadow 0.55s ease;
+    animation: cnav-fadein 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes cnav-fadein {
+    from { opacity: 0; transform: translateY(-24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  #cyber-nav-{{ section.id }}.is-scrolled {
+    background: rgba(8, 0, 0, 0.88);
+    backdrop-filter: blur(22px) saturate(180%);
+    -webkit-backdrop-filter: blur(22px) saturate(180%);
+    border-bottom: 1px solid rgba(220, 15, 15, 0.25);
+    padding: 14px 52px;
+    box-shadow: 0 6px 40px rgba(0, 0, 0, 0.45);
+  }
+
+  /* ---- LOGO ---- */
+  .cnav__logo {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+
+  .cnav__logo-img {
+    max-height: 38px;
+    width: auto;
+    display: block;
+  }
+
+  .cnav__logo-text {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: 17px;
+    color: #ffffff;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  .cnav__logo-text em {
+    color: #dc0f0f;
+    font-style: normal;
+  }
+
+  /* ---- CENTER LINKS ---- */
+  .cnav__links {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 44px;
+    list-style: none;
+  }
+
+  .cnav__links li a {
+    position: relative;
+    font-family: 'Orbitron', monospace;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.72);
+    text-decoration: none;
+    padding-bottom: 5px;
+    transition: color 0.3s ease;
+    white-space: nowrap;
+  }
+
+  .cnav__links li a::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 0;
+    height: 1.5px;
+    background: #dc0f0f;
+    transform: translateX(-50%);
+    transition: width 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 0 10px rgba(220, 15, 15, 0.8);
+  }
+
+  .cnav__links li a:hover,
+  .cnav__links li a.is-active {
+    color: #ffffff;
+  }
+
+  .cnav__links li a:hover::before,
+  .cnav__links li a.is-active::before {
+    width: 100%;
+  }
+
+  /* ---- RIGHT SIDE ---- */
+  .cnav__right {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-shrink: 0;
+  }
+
+  /* CTA Button */
+  .cnav__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 10px 26px;
+    font-family: 'Orbitron', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #ffffff;
+    text-decoration: none;
+    border: 1.5px solid rgba(220, 15, 15, 0.65);
+    background: rgba(220, 15, 15, 0.1);
+    clip-path: polygon(0 0, calc(100% - 9px) 0, 100% 9px, 100% 100%, 9px 100%, 0 calc(100% - 9px));
+    transition: background 0.32s ease, border-color 0.32s ease, box-shadow 0.32s ease, color 0.32s ease;
+    white-space: nowrap;
+  }
+
+  .cnav__cta:hover {
+    background: #dc0f0f;
+    border-color: #dc0f0f;
+    box-shadow: 0 0 22px rgba(220, 15, 15, 0.55);
+    color: #ffffff;
+  }
+
+  .cnav__cta-dot {
+    width: 6px;
+    height: 6px;
+    background: #dc0f0f;
+    border-radius: 50%;
+    flex-shrink: 0;
+    animation: cnav-pulse 2.2s ease-in-out infinite;
+  }
+
+  .cnav__cta:hover .cnav__cta-dot {
+    background: #ffffff;
+  }
+
+  @keyframes cnav-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.45; transform: scale(0.65); }
+  }
+
+  /* ---- HAMBURGER ---- */
+  .cnav__hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    padding: 8px;
+    background: none;
+    border: none;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .cnav__hamburger span {
+    display: block;
+    width: 24px;
+    height: 1.5px;
+    background: #ffffff;
+    transform-origin: center;
+    transition: transform 0.38s ease, opacity 0.3s ease, background 0.3s ease;
+  }
+
+  .cnav__hamburger.is-open span:nth-child(1) {
+    transform: rotate(45deg) translate(4.5px, 5px);
+  }
+  .cnav__hamburger.is-open span:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+  .cnav__hamburger.is-open span:nth-child(3) {
+    transform: rotate(-45deg) translate(4.5px, -5px);
+  }
+
+  /* ---- MOBILE MENU ---- */
+  .cnav__mobile {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    background: rgba(6, 0, 0, 0.97);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    transform: translateX(100%);
+    transition: transform 0.52s cubic-bezier(0.16, 1, 0.3, 1);
+    border-left: 1px solid rgba(220, 15, 15, 0.18);
+  }
+
+  .cnav__mobile.is-open {
+    transform: translateX(0);
+  }
+
+  .cnav__mobile a {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(18px, 5vw, 30px);
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: none;
+    transition: color 0.3s ease, letter-spacing 0.3s ease;
+  }
+
+  .cnav__mobile a:hover,
+  .cnav__mobile a.is-active {
+    color: #ffffff;
+    letter-spacing: 0.3em;
+  }
+
+  .cnav__mobile .cnav__mobile-cta {
+    margin-top: 12px;
+    font-size: 11px;
+    color: #dc0f0f;
+    border: 1px solid rgba(220, 15, 15, 0.45);
+    padding: 14px 36px;
+  }
+
+  .cnav__mobile .cnav__mobile-cta:hover {
+    background: rgba(220, 15, 15, 0.15);
+    letter-spacing: 0.3em;
+  }
+
+  /* ---- RESPONSIVE BREAKPOINTS ---- */
+  @media (max-width: 960px) {
+    .cnav__links {
+      display: none;
+    }
+    .cnav__hamburger {
+      display: flex;
+    }
+    #cyber-nav-{{ section.id }} {
+      padding: 20px 28px;
+    }
+    #cyber-nav-{{ section.id }}.is-scrolled {
+      padding: 14px 28px;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .cnav__cta {
+      display: none;
+    }
+  }
+</style>
+
+<!-- Navbar -->
+<nav id="cyber-nav-{{ section.id }}" aria-label="Main navigation">
+
+  <!-- Logo -->
+  <a href="{{ routes.root_url }}" class="cnav__logo" aria-label="{{ shop.name }} home">
+    {%- if section.settings.logo != blank -%}
+      {{
+        section.settings.logo
+        | image_url: width: 280
+        | image_tag:
+          class: 'cnav__logo-img',
+          loading: 'eager',
+          alt: section.settings.logo.alt | default: shop.name
+      }}
+    {%- else -%}
+      <span class="cnav__logo-text">
+        {%- assign logo_parts = section.settings.logo_text | default: shop.name | split: '|' -%}
+        {{ logo_parts[0] }}<em>{{ logo_parts[1] | default: section.settings.logo_accent | default: 'X' }}</em>
+      </span>
+    {%- endif -%}
+  </a>
+
+  <!-- Desktop nav links -->
+  <ul class="cnav__links" role="list">
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'nav_link' -%}
+        <li {{ block.shopify_attributes }}>
+          <a
+            href="{{ block.settings.url | default: '#' }}"
+            {%- if block.settings.url == request.path %} class="is-active" aria-current="page"{%- endif -%}
+          >{{ block.settings.label }}</a>
+        </li>
+      {%- endif -%}
+    {%- endfor -%}
+  </ul>
+
+  <!-- Right side -->
+  <div class="cnav__right">
+    {%- if section.settings.cta_label != blank -%}
+      <a href="{{ section.settings.cta_url | default: '#' }}" class="cnav__cta">
+        <span class="cnav__cta-dot"></span>
+        {{ section.settings.cta_label }}
+      </a>
+    {%- endif -%}
+
+    <button
+      class="cnav__hamburger"
+      id="cnav-hamburger-{{ section.id }}"
+      aria-label="Toggle navigation menu"
+      aria-expanded="false"
+      aria-controls="cnav-mobile-{{ section.id }}"
+    >
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile menu -->
+<div
+  class="cnav__mobile"
+  id="cnav-mobile-{{ section.id }}"
+  aria-hidden="true"
+  role="dialog"
+  aria-label="Mobile navigation"
+>
+  {%- for block in section.blocks -%}
+    {%- if block.type == 'nav_link' -%}
+      <a
+        href="{{ block.settings.url | default: '#' }}"
+        {%- if block.settings.url == request.path %} class="is-active" aria-current="page"{%- endif -%}
+      >{{ block.settings.label }}</a>
+    {%- endif -%}
+  {%- endfor -%}
+
+  {%- if section.settings.cta_label != blank -%}
+    <a href="{{ section.settings.cta_url | default: '#' }}" class="cnav__mobile-cta">
+      {{ section.settings.cta_label }}
+    </a>
+  {%- endif -%}
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var navEl      = document.getElementById('cyber-nav-{{ section.id }}');
+  var hamburger  = document.getElementById('cnav-hamburger-{{ section.id }}');
+  var mobileMenu = document.getElementById('cnav-mobile-{{ section.id }}');
+  var isOpen     = false;
+
+  /* ---- Scroll: transparent → glass ---- */
+  function onScroll() {
+    if (window.scrollY > 40) {
+      navEl.classList.add('is-scrolled');
+    } else {
+      navEl.classList.remove('is-scrolled');
+    }
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  /* ---- Hamburger toggle ---- */
+  function toggleMenu(force) {
+    isOpen = typeof force === 'boolean' ? force : !isOpen;
+    hamburger.classList.toggle('is-open', isOpen);
+    mobileMenu.classList.toggle('is-open', isOpen);
+    hamburger.setAttribute('aria-expanded', String(isOpen));
+    mobileMenu.setAttribute('aria-hidden', String(!isOpen));
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+  }
+
+  if (hamburger) hamburger.addEventListener('click', function() { toggleMenu(); });
+
+  /* Close on link click */
+  if (mobileMenu) {
+    mobileMenu.querySelectorAll('a').forEach(function (link) {
+      link.addEventListener('click', function () { toggleMenu(false); });
+    });
+  }
+
+  /* Close on Escape */
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && isOpen) toggleMenu(false);
+  });
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Cyber Navigation",
+  "tag": "div",
+  "class": "cyber-nav-wrapper",
+  "limit": 1,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Logo"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo Image",
+      "info": "Leave blank to use text logo"
+    },
+    {
+      "type": "text",
+      "id": "logo_text",
+      "label": "Logo Text",
+      "info": "Separate main text and accent with | e.g. NEXUS|X",
+      "default": "NEXUS|X"
+    },
+    {
+      "type": "text",
+      "id": "logo_accent",
+      "label": "Logo Accent Letter (fallback)",
+      "default": "X"
+    },
+    {
+      "type": "header",
+      "content": "Call to Action"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "CTA Button Label",
+      "default": "JOIN NOW"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "CTA Button Link"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "nav_link",
+      "name": "Navigation Link",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Link Label",
+          "default": "HOME"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Link URL"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Cyber Navigation",
+      "blocks": [
+        { "type": "nav_link", "settings": { "label": "HOME" } },
+        { "type": "nav_link", "settings": { "label": "ABOUT" } },
+        { "type": "nav_link", "settings": { "label": "SERVER" } },
+        { "type": "nav_link", "settings": { "label": "CONTACT" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

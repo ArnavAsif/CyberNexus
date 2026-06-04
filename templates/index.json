@@ -1,0 +1,409 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "cyber_hero_mKhzNt": {
+      "type": "cyber-hero",
+      "blocks": {
+        "slide_b9CC4Q": {
+          "type": "slide",
+          "settings": {
+            "bg_color": "#cc0000",
+            "bg_color2": "#4a0000",
+            "character_image": "shopify://shop_images/remove_the_text_only_2K_202606020909.png",
+            "enable_float": true,
+            "tag": "NEW SEASON",
+            "headline": "WELCOME\nTO THE\nFUTURE",
+            "subtext": "Join now and discover more.",
+            "primary_btn_label": "EXPLORE",
+            "primary_btn_url": "",
+            "secondary_btn_label": "Learn More",
+            "secondary_btn_url": "",
+            "show_newsletter": true,
+            "newsletter_placeholder": "Email Address",
+            "watermark_1": "WELCOME",
+            "watermark_2": "TO THE",
+            "watermark_3": "FUTURE"
+          }
+        },
+        "slide_yUggGw": {
+          "type": "slide",
+          "settings": {
+            "bg_color": "#cc0000",
+            "bg_color2": "#4a0000",
+            "character_image": "shopify://shop_images/now_change_the_model_2K_202606020912_1.png",
+            "enable_float": true,
+            "tag": "NEW SEASON",
+            "headline": "WELCOME\nTO THE\nFUTURE",
+            "subtext": "Join now and discover more.",
+            "primary_btn_label": "EXPLORE",
+            "primary_btn_url": "",
+            "secondary_btn_label": "Learn More",
+            "secondary_btn_url": "",
+            "show_newsletter": true,
+            "newsletter_placeholder": "Email Address",
+            "watermark_1": "WELCOME",
+            "watermark_2": "TO THE",
+            "watermark_3": "FUTURE"
+          }
+        },
+        "slide_89NDwE": {
+          "type": "slide",
+          "settings": {
+            "bg_color": "#cc0000",
+            "bg_color2": "#4a0000",
+            "character_image": "shopify://shop_images/change_the_model_please_2K_202606020912.png",
+            "enable_float": true,
+            "tag": "NEW SEASON",
+            "headline": "WELCOME\nTO THE\nFUTURE",
+            "subtext": "Join now and discover more.",
+            "primary_btn_label": "EXPLORE",
+            "primary_btn_url": "",
+            "secondary_btn_label": "Learn More",
+            "secondary_btn_url": "",
+            "show_newsletter": true,
+            "newsletter_placeholder": "Email Address",
+            "watermark_1": "WELCOME",
+            "watermark_2": "TO THE",
+            "watermark_3": "FUTURE"
+          }
+        },
+        "slide_tqByBn": {
+          "type": "slide",
+          "settings": {
+            "bg_color": "#cc0000",
+            "bg_color2": "#4a0000",
+            "character_image": "shopify://shop_images/now_change_the_model_2K_202606020912.png",
+            "enable_float": true,
+            "tag": "NEW SEASON",
+            "headline": "WELCOME\nTO THE\nFUTURE",
+            "subtext": "Join now and discover more.",
+            "primary_btn_label": "EXPLORE",
+            "primary_btn_url": "",
+            "secondary_btn_label": "Learn More",
+            "secondary_btn_url": "",
+            "show_newsletter": true,
+            "newsletter_placeholder": "Email Address",
+            "watermark_1": "WELCOME",
+            "watermark_2": "TO THE",
+            "watermark_3": "FUTURE"
+          }
+        }
+      },
+      "block_order": [
+        "slide_b9CC4Q",
+        "slide_yUggGw",
+        "slide_89NDwE",
+        "slide_tqByBn"
+      ],
+      "name": "Cyber Hero Slider",
+      "settings": {
+        "autoplay": false,
+        "autoplay_delay": 3,
+        "show_socials": true,
+        "facebook_url": "#",
+        "youtube_url": "#",
+        "instagram_url": "#"
+      }
+    },
+    "cyber_about_Vqkr9c": {
+      "type": "cyber-about",
+      "blocks": {
+        "feature_dNtyBz": {
+          "type": "feature",
+          "settings": {
+            "icon": "globe",
+            "title": "EPIC WORLD",
+            "description": "A vast universe filled with mystery and adventure."
+          }
+        },
+        "feature_r4nrgm": {
+          "type": "feature",
+          "settings": {
+            "icon": "community",
+            "title": "STRONG COMMUNITY",
+            "description": "Thousands of players. One unstoppable force."
+          }
+        },
+        "feature_8XjiRN": {
+          "type": "feature",
+          "settings": {
+            "icon": "refresh",
+            "title": "CONSTANT EVOLUTION",
+            "description": "Regular updates and exciting new content."
+          }
+        }
+      },
+      "block_order": [
+        "feature_dNtyBz",
+        "feature_r4nrgm",
+        "feature_8XjiRN"
+      ],
+      "name": "Cyber About",
+      "settings": {
+        "tag": "About CyberNexus",
+        "headline": "BUILT FOR\nWARRIORS.\nDESIGNED FOR\nLEGENDS.",
+        "body_text": "CyberNexus is more than a game. It's a world where warriors, legends, and futures collide.",
+        "stat_1_num": "500K+",
+        "stat_1_label": "Players",
+        "stat_2_num": "120+",
+        "stat_2_label": "Missions",
+        "stat_3_num": "4.9★",
+        "stat_3_label": "Rating",
+        "btn_label": "LEARN MORE",
+        "btn_url": "",
+        "video_url": "https://cdn.shopify.com/videos/c/o/v/0ce76e2c011f49279e01c6fda55a4b7f.mp4",
+        "video_hud_label": "LIVE PREVIEW"
+      }
+    },
+    "server_status_DzJQW7": {
+      "type": "server-status",
+      "blocks": {
+        "server_Qzpyd4": {
+          "type": "server",
+          "settings": {
+            "name": "NEXUS CORE",
+            "status": "online",
+            "players_current": "1245",
+            "players_max": "2000"
+          }
+        },
+        "server_gizhRa": {
+          "type": "server",
+          "settings": {
+            "name": "RISING DAWN",
+            "status": "online",
+            "players_current": "980",
+            "players_max": "2000"
+          }
+        },
+        "server_pi9BqL": {
+          "type": "server",
+          "settings": {
+            "name": "SHADOW REALM",
+            "status": "online",
+            "players_current": "856",
+            "players_max": "2000"
+          }
+        },
+        "server_WiLmhF": {
+          "type": "server",
+          "settings": {
+            "name": "ETERNAL WAR",
+            "status": "maintenance",
+            "players_current": "0",
+            "players_max": "2000"
+          }
+        }
+      },
+      "block_order": [
+        "server_Qzpyd4",
+        "server_gizhRa",
+        "server_pi9BqL",
+        "server_WiLmhF"
+      ],
+      "name": "Cyber Server Status",
+      "settings": {
+        "bg_image": "shopify://shop_images/need_the_img_only_remove_202606031105.jpg",
+        "character_image": "shopify://shop_images/need_the_img_only_remove_202606031105.jpg",
+        "tag": "Server Status",
+        "headline": "LIVE SERVER\n<em class=\"red\">STATUS</em>",
+        "body_text": "Real-time updates on all servers.",
+        "btn_label": "VIEW ALL SERVERS",
+        "btn_url": ""
+      }
+    },
+    "cyber_features_HxCC3h": {
+      "type": "cyber-features",
+      "blocks": {
+        "feature_hJ3MnL": {
+          "type": "feature",
+          "settings": {
+            "icon": "graphics",
+            "title": "STUNNING GRAPHICS",
+            "description": "Next-gen visuals that bring the world to life.",
+            "link_label": "LEARN MORE",
+            "link_url": ""
+          }
+        },
+        "feature_AVJCHd": {
+          "type": "feature",
+          "settings": {
+            "icon": "pvp",
+            "title": "PVP & PVE BATTLES",
+            "description": "Battle players or conquer powerful bosses.",
+            "link_label": "LEARN MORE",
+            "link_url": ""
+          }
+        },
+        "feature_AfjPyF": {
+          "type": "feature",
+          "settings": {
+            "icon": "classes",
+            "title": "CUSTOM CLASSES",
+            "description": "Build your hero. Your way.",
+            "link_label": "LEARN MORE",
+            "link_url": ""
+          }
+        },
+        "feature_awecbc": {
+          "type": "feature",
+          "settings": {
+            "icon": "guild",
+            "title": "GUILD SYSTEM",
+            "description": "Join or create guilds and rule together.",
+            "link_label": "LEARN MORE",
+            "link_url": ""
+          }
+        },
+        "feature_a9wjy9": {
+          "type": "feature",
+          "settings": {
+            "icon": "economy",
+            "title": "ECONOMY SYSTEM",
+            "description": "Trade, craft, and dominate the market.",
+            "link_label": "LEARN MORE",
+            "link_url": ""
+          }
+        },
+        "feature_jpx3xU": {
+          "type": "feature",
+          "settings": {
+            "icon": "events",
+            "title": "EVENTS & REWARDS",
+            "description": "Join events and earn exclusive rewards.",
+            "link_label": "LEARN MORE",
+            "link_url": ""
+          }
+        }
+      },
+      "block_order": [
+        "feature_hJ3MnL",
+        "feature_AVJCHd",
+        "feature_AfjPyF",
+        "feature_awecbc",
+        "feature_a9wjy9",
+        "feature_jpx3xU"
+      ],
+      "name": "Cyber Features",
+      "settings": {
+        "tag": "Features",
+        "headline": "WHY PLAY\n<em class=\"red\">CYBERNEXUS?</em>"
+      }
+    },
+    "cyber_showcase_CwjKdV": {
+      "type": "cyber-showcase",
+      "blocks": {
+        "media_item_EW9Pgy": {
+          "type": "media_item",
+          "settings": {
+            "video_url": "https://cdn.shopify.com/videos/c/o/v/9b13cd44d3d7422998aeeb91f12202f8.mp4",
+            "label": "Cinematic Trailer"
+          }
+        },
+        "media_item_AEMnXd": {
+          "type": "media_item",
+          "settings": {
+            "media_image": "shopify://shop_images/A_futuristic_cyberpunk_megacity_rising_202606031144.jpg",
+            "video_url": "",
+            "label": "World Screenshot"
+          }
+        },
+        "media_item_A6U947": {
+          "type": "media_item",
+          "settings": {
+            "media_image": "shopify://shop_images/Two_warriors_clashing_swords_in_202606031146.jpg",
+            "video_url": "",
+            "label": "Combat Preview"
+          }
+        }
+      },
+      "block_order": [
+        "media_item_EW9Pgy",
+        "media_item_AEMnXd",
+        "media_item_A6U947"
+      ],
+      "name": "Cyber Showcase",
+      "settings": {
+        "tag": "Media",
+        "headline": "GAMEPLAY\n<em class=\"red\">SHOWCASE</em>",
+        "body_text": "Watch. Feel. Join the battle.\nThis is CyberNexus.",
+        "btn_label": "WATCH TRAILER",
+        "btn_url": "",
+        "autoplay": true,
+        "autoplay_delay": 10
+      }
+    },
+    "cyber_news_8e39c9": {
+      "type": "cyber-news",
+      "blocks": {
+        "news_item_WThrXi": {
+          "type": "news_item",
+          "settings": {
+            "card_image": "shopify://shop_images/Two_warriors_clashing_swords_in_202606031159.jpg",
+            "category": "SEASON",
+            "date": "MAY 15, 2025",
+            "title": "New Season: Rise of Nexus",
+            "excerpt": "Prepare for new challenges, rewards, and battles.",
+            "link_label": "READ MORE",
+            "link_url": ""
+          }
+        },
+        "news_item_3b7tGU": {
+          "type": "news_item",
+          "settings": {
+            "card_image": "shopify://shop_images/A_lone_cyber_samurai_walking_202606031200.jpg",
+            "category": "MAINTENANCE",
+            "date": "MAY 10, 2025",
+            "title": "Maintenance Complete",
+            "excerpt": "All servers are back online and better than ever.",
+            "link_label": "READ MORE",
+            "link_url": ""
+          }
+        },
+        "news_item_hEitA3": {
+          "type": "news_item",
+          "settings": {
+            "card_image": "shopify://shop_images/Dark_futuristic_city_under_attack__202606031201.jpg",
+            "category": "EVENT",
+            "date": "MAY 05, 2025",
+            "title": "PvP Tournament Announced",
+            "excerpt": "Join the ultimate battle and win exclusive rewards.",
+            "link_label": "READ MORE",
+            "link_url": ""
+          }
+        }
+      },
+      "block_order": [
+        "news_item_WThrXi",
+        "news_item_3b7tGU",
+        "news_item_hEitA3"
+      ],
+      "name": "Cyber News",
+      "settings": {
+        "tag": "Latest News",
+        "headline": "NEWS &\n<em class=\"red\">UPDATES</em>",
+        "btn_label": "VIEW ALL NEWS",
+        "btn_url": "",
+        "blog": "",
+        "posts_count": 3,
+        "read_more_label": "READ MORE"
+      }
+    }
+  },
+  "order": [
+    "cyber_hero_mKhzNt",
+    "cyber_about_Vqkr9c",
+    "server_status_DzJQW7",
+    "cyber_features_HxCC3h",
+    "cyber_showcase_CwjKdV",
+    "cyber_news_8e39c9"
+  ]
+}

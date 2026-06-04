@@ -1,0 +1,660 @@
+{%- comment -%}
+=======================================================
+  CYBER FEATURES — sections/cyber-features.liquid
+  Light bg, tag + headline top-left, feature cards row
+=======================================================
+{%- endcomment -%}
+
+<style>
+/* ══════════════════════════════════════════════════════
+   TOKENS
+══════════════════════════════════════════════════════ */
+#cft-{{ section.id }} {
+  --cr:      #dc0f0f;
+  --cr-glow: rgba(220,15,15,.4);
+  --cr-dim:  rgba(220,15,15,.08);
+  --cdark:   #0d0d0d;
+  --cborder: rgba(0,0,0,.08);
+  --cbg:     #f0f0f0;
+  --cgray:   rgba(20,20,20,.55);
+  --fh:      'Orbitron', monospace;
+  --fb:      'Rajdhani', sans-serif;
+  --ease:    cubic-bezier(.16,1,.3,1);
+}
+
+/* ══════════════════════════════════════════════════════
+   SECTION
+══════════════════════════════════════════════════════ */
+#cft-{{ section.id }} {
+  position: relative;
+  width: 100%;
+  background: var(--cbg);
+  font-family: var(--fb);
+  overflow: hidden;
+  padding: 80px 0 90px;
+}
+
+/* top red line */
+#cft-{{ section.id }}::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(220,15,15,.5) 20%,
+    rgba(220,15,15,1)  50%,
+    rgba(220,15,15,.5) 80%,
+    transparent 100%
+  );
+  z-index: 3;
+}
+
+/* subtle grid texture */
+#cft-{{ section.id }}::after {
+  content: '';
+  position: absolute;
+  inset: 0; z-index: 0;
+  pointer-events: none;
+  opacity: .025;
+  background-image:
+    linear-gradient(rgba(220,15,15,1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(220,15,15,1) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+/* ══════════════════════════════════════════════════════
+   INNER
+══════════════════════════════════════════════════════ */
+.cft-inner {
+  position: relative;
+  z-index: 2;
+  max-width: 1760px;
+  margin: 0 auto;
+  padding: 0 60px;
+}
+
+/* ══════════════════════════════════════════════════════
+   HEADER — tag + headline
+══════════════════════════════════════════════════════ */
+.cft-header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 48px;
+}
+
+.cft-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--fh);
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: .32em;
+  text-transform: uppercase;
+  color: var(--cr);
+}
+.cft-tag::before {
+  content: '';
+  width: 20px; height: 1.5px;
+  background: var(--cr);
+  box-shadow: 0 0 8px var(--cr-glow);
+  flex-shrink: 0;
+}
+
+.cft-headline {
+  font-family: var(--fh);
+  font-size: clamp(26px, 3.2vw, 46px);
+  font-weight: 900;
+  line-height: 1.0;
+  letter-spacing: -.01em;
+  text-transform: uppercase;
+  color: var(--cdark);
+  margin: 0;
+}
+.cft-headline .red {
+  color: var(--cr);
+  display: block;
+  text-shadow: 0 0 40px rgba(220,15,15,.18);
+}
+
+/* ══════════════════════════════════════════════════════
+   CARDS GRID
+══════════════════════════════════════════════════════ */
+.cft-grid {
+  display: grid;
+  grid-template-columns: repeat({{ section.blocks | where: 'type','feature' | size | at_most: 6 }}, 1fr);
+  gap: 0;
+  border: 1px solid var(--cborder);
+}
+
+/* fallback for any count */
+.cft-grid { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+
+/* ── CARD ── */
+.cft-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 28px 24px 24px;
+  background: #fff;
+  border-right: 1px solid var(--cborder);
+  overflow: hidden;
+  cursor: default;
+  transition: background .3s, box-shadow .3s;
+}
+.cft-card:last-child { border-right: none; }
+
+/* hover bg fill */
+.cft-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(220,15,15,.06) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity .35s;
+}
+.cft-card:hover::before { opacity: 1; }
+
+/* top red bar on hover */
+.cft-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--cr);
+  box-shadow: 0 0 12px var(--cr-glow);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .4s var(--ease);
+}
+.cft-card:hover::after { transform: scaleX(1); }
+
+/* ── ICON BOX ── */
+.cft-icon-box {
+  width: 52px; height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid rgba(220,15,15,.35);
+  clip-path: polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));
+  background: rgba(220,15,15,.05);
+  color: var(--cr);
+  flex-shrink: 0;
+  transition: background .3s, border-color .3s, box-shadow .3s, transform .3s;
+}
+.cft-card:hover .cft-icon-box {
+  background: rgba(220,15,15,.12);
+  border-color: var(--cr);
+  box-shadow: 0 0 18px var(--cr-glow);
+  transform: scale(1.06);
+}
+
+/* ── CARD TITLE ── */
+.cft-card-title {
+  font-family: var(--fh);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--cdark);
+  margin: 0;
+  line-height: 1.3;
+  transition: color .3s;
+}
+.cft-card:hover .cft-card-title { color: var(--cr); }
+
+/* ── CARD DESC ── */
+.cft-card-desc {
+  font-family: var(--fb);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--cgray);
+  margin: 0;
+  flex: 1;
+}
+
+/* ── LEARN MORE LINK ── */
+.cft-card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--fh);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--cdark);
+  text-decoration: none;
+  transition: color .3s;
+  margin-top: auto;
+}
+.cft-card-link svg {
+  flex-shrink: 0;
+  transition: transform .3s var(--ease);
+}
+.cft-card:hover .cft-card-link { color: var(--cr); }
+.cft-card:hover .cft-card-link svg { transform: translateX(5px); }
+
+/* ══════════════════════════════════════════════════════
+   SCROLL REVEAL
+══════════════════════════════════════════════════════ */
+.cft-reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity .6s var(--ease), transform .6s var(--ease);
+}
+.cft-reveal.cft-fl { transform: translateX(-28px); }
+.cft-reveal.in-view { opacity: 1; transform: translate(0,0); }
+
+.cft-d0 { transition-delay: .00s; }
+.cft-d1 { transition-delay: .06s; }
+.cft-d2 { transition-delay: .12s; }
+.cft-d3 { transition-delay: .18s; }
+.cft-d4 { transition-delay: .24s; }
+.cft-d5 { transition-delay: .30s; }
+.cft-d6 { transition-delay: .36s; }
+
+/* ══════════════════════════════════════════════════════
+   TABLET ≤ 1024px
+══════════════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .cft-inner { padding: 0 32px; }
+  .cft-grid  { grid-template-columns: repeat(3, 1fr); }
+  .cft-card  { border-bottom: 1px solid var(--cborder); }
+  .cft-card:nth-child(3n) { border-right: none; }
+}
+
+/* ══════════════════════════════════════════════════════
+   MOBILE ≤ 600px
+══════════════════════════════════════════════════════ */
+@media (max-width: 600px) {
+  #cft-{{ section.id }} { padding: 56px 0 64px; }
+  .cft-inner  { padding: 0 18px; }
+  .cft-grid   { grid-template-columns: repeat(2, 1fr); }
+  .cft-card:nth-child(3n)  { border-right: 1px solid var(--cborder); }
+  .cft-card:nth-child(2n)  { border-right: none; }
+  .cft-headline { font-size: clamp(22px, 7vw, 34px); }
+  .cft-card { padding: 22px 18px 20px; }
+}
+
+@media (max-width: 380px) {
+  .cft-grid { grid-template-columns: 1fr; }
+  .cft-card { border-right: none !important; }
+}
+
+/* ══════════════════════════════════════════════════════
+   REDUCED MOTION
+══════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .cft-reveal { opacity: 1; transform: none; transition: none; }
+  .cft-card::after { transition: none; }
+  .cft-icon-box { transition: none; }
+}
+</style>
+
+<section id="cft-{{ section.id }}" aria-label="Features">
+  <div class="cft-inner">
+
+    <!-- HEADER -->
+    <div class="cft-header">
+      {%- if section.settings.tag != blank -%}
+        <span class="cft-tag cft-reveal cft-fl cft-d0">
+          {{ section.settings.tag }}
+        </span>
+      {%- endif -%}
+      {%- if section.settings.headline != blank -%}
+        <h2 class="cft-headline cft-reveal cft-fl cft-d1">
+          {{- section.settings.headline | newline_to_br -}}
+        </h2>
+      {%- endif -%}
+    </div>
+
+    <!-- CARDS -->
+    {%- assign feat_blocks = section.blocks | where: 'type', 'feature' -%}
+    {%- if feat_blocks.size > 0 -%}
+      <div class="cft-grid">
+        {%- for block in feat_blocks -%}
+          {%- assign di = forloop.index0 | plus: 1 -%}
+          {%- if di > 6 -%}{%- assign di = 6 -%}{%- endif -%}
+
+          <div class="cft-card cft-reveal cft-d{{ di }}"
+               {{ block.shopify_attributes }}>
+
+            <!-- ICON -->
+            <div class="cft-icon-box" aria-hidden="true">
+              {%- case block.settings.icon -%}
+
+                {%- when 'graphics' -%}
+                  <!-- monitor / display icon -->
+                  <svg width="26" height="26" viewBox="0 0 26 26" fill="none"
+                       stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="3" width="22" height="15" rx="1.5"/>
+                    <path d="M8 23h10M13 18v5"/>
+                    <circle cx="13" cy="10.5" r="3"/>
+                    <path d="M4 7h1M4 11h1"/>
+                  </svg>
+
+                {%- when 'pvp' -%}
+                  <!-- crossed swords -->
+                  <svg width="26" height="26" viewBox="0 0 26 26" fill="none"
+                       stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 3l8 8M21 3l-8 8"/>
+                    <path d="M3 3l5 1-1 5M21 3l-5 1 1 5"/>
+                    <path d="M11 15l-3 3-2 1 1-2 3-3M15 11l3-3 2-1-1 2-3 3"/>
+                    <path d="M10 16l6-6"/>
+                  </svg>
+
+                {%- when 'classes' -%}
+                  <!-- wand / staff -->
+                  <svg width="26" height="26" viewBox="0 0 26 26" fill="none"
+                       stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 22L16 10"/>
+                    <path d="M16 10l2-5 2 2-5 2z" fill="currentColor" stroke="none"/>
+                    <circle cx="17" cy="9" r="2.5"/>
+                    <path d="M20 4l1-1M22 7h1M20 10l1 1M14 4l-1-1"/>
+                  </svg>
+
+                {%- when 'guild' -%}
+                  <!-- shield + people -->
+                  <svg width="26" height="26" viewBox="0 0 26 26" fill="none"
+                       stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M13 2L4 6v7c0 5.5 3.9 10.7 9 12 5.1-1.3 9-6.5 9-12V6L13 2z"/>
+                    <path d="M9 13l2.5 2.5L17 10"/>
+                  </svg>
+
+                {%- when 'economy' -%}
+                  <!-- coin / trade -->
+                  <svg width="26" height="26" viewBox="0 0 26 26" fill="none"
+                       stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="13" cy="13" r="10"/>
+                    <circle cx="13" cy="13" r="6"/>
+                    <path d="M13 7v2M13 17v2M7 13h2M17 13h2"/>
+                    <path d="M11 11h2.5a1.5 1.5 0 0 1 0 3h-1a1.5 1.5 0 0 0 0 3H15"/>
+                  </svg>
+
+                {%- when 'events' -%}
+                  <!-- star / burst -->
+                  <svg width="26" height="26" viewBox="0 0 26 26" fill="none"
+                       stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M13 2l2.4 7.4H23l-6.2 4.5 2.4 7.4L13 17l-6.2 4.3 2.4-7.4L3 9.4h7.6L13 2z"/>
+                    <circle cx="13" cy="13" r="2.5" fill="currentColor" stroke="none"/>
+                  </svg>
+
+                {%- when 'map' -%}
+                  <svg width="26" height="26" viewBox="0 0 26 26" fill="none"
+                       stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 5l7-3 8 4 7-3v19l-7 3-8-4-7 3V5z"/>
+                    <path d="M9 2v19M17 6v19"/>
+                  </svg>
+
+                {%- when 'trophy' -%}
+                  <svg width="26" height="26" viewBox="0 0 26 26" fill="none"
+                       stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M7 3h12v8a6 6 0 0 1-12 0V3z"/>
+                    <path d="M7 7H4a2 2 0 0 0 0 4h3M19 7h3a2 2 0 0 1 0 4h-3"/>
+                    <path d="M13 17v4M9 21h8"/>
+                  </svg>
+
+                {%- when 'zap' -%}
+                  <svg width="26" height="26" viewBox="0 0 26 26" fill="none"
+                       stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="14 2 4 15 13 15 12 24 22 11 13 11 14 2"/>
+                  </svg>
+
+                {%- when 'globe' -%}
+                  <svg width="26" height="26" viewBox="0 0 26 26" fill="none"
+                       stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="13" cy="13" r="11"/>
+                    <path d="M2 13h22"/>
+                    <path d="M13 2a17 17 0 0 1 4 11 17 17 0 0 1-4 11 17 17 0 0 1-4-11 17 17 0 0 1 4-11z"/>
+                  </svg>
+
+                {%- when 'target' -%}
+                  <svg width="26" height="26" viewBox="0 0 26 26" fill="none"
+                       stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="13" cy="13" r="11"/>
+                    <circle cx="13" cy="13" r="6"/>
+                    <circle cx="13" cy="13" r="2"/>
+                  </svg>
+
+                {%- when 'users' -%}
+                  <svg width="26" height="26" viewBox="0 0 26 26" fill="none"
+                       stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 22v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                    <circle cx="10" cy="8" r="4"/>
+                    <path d="M24 22v-2a4 4 0 0 0-3-3.87"/>
+                    <path d="M17 4.13a4 4 0 0 1 0 7.75"/>
+                  </svg>
+
+                {%- when 'sword' -%}
+                  <svg width="26" height="26" viewBox="0 0 26 26" fill="none"
+                       stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 22l4-4M5 21l-2 1 1-2M15 4L5 14l2 2 10-10 4 1-1-4-1-3zM14 7l5 5"/>
+                  </svg>
+
+                {%- else -%}
+                  <!-- default: diamond -->
+                  <svg width="26" height="26" viewBox="0 0 26 26" fill="none"
+                       stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M13 2L24 9l-11 15L2 9z"/>
+                    <path d="M2 9h22M13 2l4 7M13 2l-4 7M13 24l4-8M13 24l-4-8"/>
+                  </svg>
+              {%- endcase -%}
+            </div>
+
+            <!-- TITLE -->
+            {%- if block.settings.title != blank -%}
+              <h3 class="cft-card-title">{{ block.settings.title }}</h3>
+            {%- endif -%}
+
+            <!-- DESC -->
+            {%- if block.settings.description != blank -%}
+              <p class="cft-card-desc">{{ block.settings.description }}</p>
+            {%- endif -%}
+
+            <!-- LINK -->
+            {%- if block.settings.link_label != blank -%}
+              <a href="{{ block.settings.link_url | default: '#' }}"
+                 class="cft-card-link">
+                {{ block.settings.link_label }}
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                  <path d="M1 6H11M11 6L7 2M11 6L7 10"
+                    stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </a>
+            {%- endif -%}
+
+          </div>
+        {%- endfor -%}
+      </div>
+
+    {%- elsif request.design_mode -%}
+      <div style="padding:48px;text-align:center;font-family:monospace;
+                  color:rgba(220,15,15,.6);font-size:13px;
+                  border:1px dashed rgba(220,15,15,.3);">
+        Add <strong>Feature</strong> blocks to display cards.
+      </div>
+    {%- endif -%}
+
+  </div>
+</section>
+
+<script>
+(function () {
+'use strict';
+var SID = '{{ section.id }}';
+
+function boot() {
+  var section = document.getElementById('cft-' + SID);
+  if (!section) return;
+
+  var items = section.querySelectorAll('.cft-reveal');
+
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) {
+          en.target.classList.add('in-view');
+          io.unobserve(en.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+    items.forEach(function (el) { io.observe(el); });
+  } else {
+    items.forEach(function (el) { el.classList.add('in-view'); });
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', boot);
+} else {
+  boot();
+}
+if (window.Shopify && Shopify.designMode) {
+  document.addEventListener('shopify:section:load', function (e) {
+    if (e.detail.sectionId === SID) boot();
+  });
+}
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Cyber Features",
+  "tag": "div",
+  "class": "cyber-features-wrapper",
+  "settings": [
+    {
+      "type": "text",
+      "id": "tag",
+      "label": "Tag / Badge",
+      "default": "Features"
+    },
+    {
+      "type": "textarea",
+      "id": "headline",
+      "label": "Headline",
+      "info": "Use <em class=\"red\">TEXT</em> on a new line to make it red.",
+      "default": "WHY PLAY\n<em class=\"red\">CYBERNEXUS?</em>"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "Feature Card",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "default": "graphics",
+          "options": [
+            { "value": "graphics",  "label": "Monitor / Graphics"   },
+            { "value": "pvp",       "label": "Crossed Swords / PvP" },
+            { "value": "classes",   "label": "Wand / Classes"       },
+            { "value": "guild",     "label": "Shield / Guild"       },
+            { "value": "economy",   "label": "Coin / Economy"       },
+            { "value": "events",    "label": "Star / Events"        },
+            { "value": "map",       "label": "Map"                  },
+            { "value": "trophy",    "label": "Trophy"               },
+            { "value": "zap",       "label": "Lightning / Zap"      },
+            { "value": "globe",     "label": "Globe"                },
+            { "value": "target",    "label": "Target"               },
+            { "value": "users",     "label": "Users / Community"    },
+            { "value": "sword",     "label": "Sword"                }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Card Title",
+          "default": "STUNNING GRAPHICS"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description",
+          "default": "Next-gen visuals that bring the world to life."
+        },
+        {
+          "type": "text",
+          "id": "link_label",
+          "label": "Link Label",
+          "default": "LEARN MORE"
+        },
+        {
+          "type": "url",
+          "id": "link_url",
+          "label": "Link URL"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Cyber Features",
+      "blocks": [
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "graphics",
+            "title": "STUNNING GRAPHICS",
+            "description": "Next-gen visuals that bring the world to life.",
+            "link_label": "LEARN MORE"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "pvp",
+            "title": "PVP & PVE BATTLES",
+            "description": "Battle players or conquer powerful bosses.",
+            "link_label": "LEARN MORE"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "classes",
+            "title": "CUSTOM CLASSES",
+            "description": "Build your hero. Your way.",
+            "link_label": "LEARN MORE"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "guild",
+            "title": "GUILD SYSTEM",
+            "description": "Join or create guilds and rule together.",
+            "link_label": "LEARN MORE"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "economy",
+            "title": "ECONOMY SYSTEM",
+            "description": "Trade, craft, and dominate the market.",
+            "link_label": "LEARN MORE"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "events",
+            "title": "EVENTS & REWARDS",
+            "description": "Join events and earn exclusive rewards.",
+            "link_label": "LEARN MORE"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

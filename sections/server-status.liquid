@@ -1,0 +1,842 @@
+{%- comment -%}
+=======================================================
+  CYBER SERVER STATUS — sections/cyber-server-status.liquid
+  Dark bg, left image, center text+btn, right server table
+=======================================================
+{%- endcomment -%}
+
+<style>
+/* ══════════════════════════════════════════════════════
+   TOKENS
+══════════════════════════════════════════════════════ */
+#css-{{ section.id }} {
+  --cr:       #dc0f0f;
+  --cr-glow:  rgba(220,15,15,.5);
+  --cr-dim:   rgba(220,15,15,.15);
+  --cg:       #00e676;
+  --cg-glow:  rgba(0,230,118,.3);
+  --cy:       #ffab00;
+  --cw:       #ffffff;
+  --cb:       #080608;
+  --cbg:      #0d0008;
+  --cfaint:   rgba(255,255,255,.06);
+  --cborder:  rgba(255,255,255,.07);
+  --fh:       'Orbitron', monospace;
+  --fb:       'Rajdhani', sans-serif;
+  --ease:     cubic-bezier(.16,1,.3,1);
+}
+
+/* ══════════════════════════════════════════════════════
+   WRAPPER
+══════════════════════════════════════════════════════ */
+#css-{{ section.id }} {
+  position: relative;
+  width: 100%;
+  background: var(--cbg);
+  font-family: var(--fb);
+  overflow: hidden;
+  /* tight vertical — matches screenshot */
+  padding: 0;
+  min-height: 220px;
+}
+
+/* top / bottom red line */
+#css-{{ section.id }}::before,
+#css-{{ section.id }}::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(220,15,15,.6) 30%,
+    rgba(220,15,15,.9) 50%,
+    rgba(220,15,15,.6) 70%,
+    transparent 100%
+  );
+  z-index: 5;
+  pointer-events: none;
+}
+#css-{{ section.id }}::before { top: 0; }
+#css-{{ section.id }}::after  { bottom: 0; }
+
+/* noise overlay */
+#css-{{ section.id }} .css-noise {
+  position: absolute;
+  inset: 0; z-index: 1;
+  pointer-events: none;
+  opacity: .03;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ══════════════════════════════════════════════════════
+   LAYOUT — 3 columns
+══════════════════════════════════════════════════════ */
+.css-inner {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 280px 280px 1fr;
+  align-items: stretch;
+  max-width: 100%;
+  height: 100%;
+}
+
+/* ══════════════════════════════════════════════════════
+   LEFT IMAGE PANEL
+══════════════════════════════════════════════════════ */
+.css-img-panel {
+  position: relative;
+  overflow: hidden;
+  min-height: 220px;
+}
+
+.css-img-panel img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  display: block;
+  filter: saturate(1.1) brightness(.85);
+}
+
+/* red overlay on image */
+.css-img-panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to right, rgba(8,0,8,.15) 0%, rgba(8,0,8,.7) 85%, var(--cbg) 100%),
+    radial-gradient(ellipse at 30% 50%, rgba(220,15,15,.22) 0%, transparent 65%);
+  z-index: 1;
+}
+
+/* right character image panel */
+.css-char-panel {
+  position: absolute;
+  right: 0; top: 0; bottom: 0;
+  width: 220px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 3;
+}
+.css-char-panel img {
+  position: absolute;
+  bottom: 0; right: 0;
+  height: 100%;
+  width: auto;
+  max-width: none;
+  object-fit: contain;
+  object-position: bottom right;
+  filter: brightness(.85) saturate(1.1);
+}
+/* fade left edge of char */
+.css-char-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, var(--cbg) 0%, transparent 40%);
+  z-index: 1;
+}
+
+/* ══════════════════════════════════════════════════════
+   CENTER — TAG + HEADLINE + BODY + BUTTON
+══════════════════════════════════════════════════════ */
+.css-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+  padding: 36px 36px 36px 28px;
+  position: relative;
+  border-right: 1px solid var(--cborder);
+  background: linear-gradient(
+    135deg,
+    rgba(220,15,15,.07) 0%,
+    transparent 60%
+  );
+}
+
+/* vertical red line left edge */
+.css-center::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 20%; bottom: 20%;
+  width: 2px;
+  background: linear-gradient(to bottom, transparent, var(--cr), transparent);
+  opacity: .6;
+}
+
+/* tag */
+.css-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--fh);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.5);
+}
+.css-tag::before {
+  content: '';
+  display: block;
+  width: 18px; height: 1px;
+  background: var(--cr);
+  box-shadow: 0 0 6px var(--cr-glow);
+  flex-shrink: 0;
+}
+
+/* headline */
+.css-headline {
+  font-family: var(--fh);
+  font-size: clamp(20px, 2.2vw, 30px);
+  font-weight: 900;
+  line-height: 1.0;
+  letter-spacing: -.01em;
+  text-transform: uppercase;
+  color: var(--cw);
+  margin: 0;
+}
+.css-headline .red {
+  color: var(--cr);
+  display: block;
+  text-shadow: 0 0 30px rgba(220,15,15,.4);
+}
+
+/* body */
+.css-body {
+  font-family: var(--fb);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: rgba(255,255,255,.5);
+  margin: 0;
+  max-width: 200px;
+}
+
+/* button — same clip-path as hero */
+.css-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: fit-content;
+  padding: 13px 26px;
+  background: transparent;
+  color: var(--cr);
+  font-family: var(--fh);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .26em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: 1.5px solid var(--cr);
+  cursor: pointer;
+  clip-path: polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));
+  transition: background .3s, color .3s, box-shadow .3s;
+  margin-top: 4px;
+}
+.css-btn:hover {
+  background: var(--cr);
+  color: var(--cw);
+  box-shadow: 0 0 24px var(--cr-glow);
+}
+.css-btn svg { flex-shrink: 0; transition: transform .3s; }
+.css-btn:hover svg { transform: translateX(4px); }
+
+/* ══════════════════════════════════════════════════════
+   RIGHT — SERVER TABLE
+══════════════════════════════════════════════════════ */
+.css-table-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 28px 40px 28px 40px;
+  /* leave room for character image on right */
+  padding-right: 240px;
+  position: relative;
+}
+
+/* table header row */
+.css-table-head {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr 44px;
+  gap: 8px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--cborder);
+  margin-bottom: 4px;
+}
+.css-th {
+  font-family: var(--fh);
+  font-size: 7.5px;
+  font-weight: 700;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.28);
+}
+
+/* server rows */
+.css-server-row {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr 44px;
+  gap: 8px;
+  align-items: center;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--cborder);
+  position: relative;
+  transition: background .25s;
+  cursor: default;
+}
+.css-server-row::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,.02);
+  opacity: 0;
+  transition: opacity .25s;
+}
+.css-server-row:hover::before { opacity: 1; }
+
+/* maintenance row — subtle red tint */
+.css-server-row.is-maintenance {
+  background: rgba(220,15,15,.04);
+}
+.css-server-row.is-maintenance::after {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 2px;
+  background: var(--cr);
+  box-shadow: 0 0 8px var(--cr-glow);
+}
+
+/* server name */
+.css-srv-name {
+  font-family: var(--fh);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--cw);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+/* small dot before name for maintenance */
+.css-server-row.is-maintenance .css-srv-name::before {
+  content: '';
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--cr);
+  flex-shrink: 0;
+  box-shadow: 0 0 6px var(--cr-glow);
+}
+
+/* status badge */
+.css-status {
+  font-family: var(--fb);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .06em;
+}
+.css-status.online {
+  color: var(--cg);
+  text-shadow: 0 0 12px var(--cg-glow);
+}
+.css-status.maintenance {
+  color: var(--cr);
+  text-shadow: 0 0 12px var(--cr-glow);
+}
+.css-status.offline {
+  color: rgba(255,255,255,.35);
+}
+
+/* player count */
+.css-players {
+  font-family: var(--fb);
+  font-size: 13px;
+  font-weight: 400;
+  color: rgba(255,255,255,.5);
+  letter-spacing: .04em;
+}
+.css-players strong {
+  color: rgba(255,255,255,.8);
+  font-weight: 600;
+}
+
+/* signal bars */
+.css-signal {
+  display: flex;
+  align-items: flex-end;
+  gap: 2.5px;
+  height: 16px;
+}
+.css-bar {
+  width: 4px;
+  border-radius: 1px;
+  background: rgba(255,255,255,.15);
+  transition: background .3s;
+}
+.css-bar:nth-child(1) { height: 5px; }
+.css-bar:nth-child(2) { height: 9px; }
+.css-bar:nth-child(3) { height: 13px; }
+.css-bar:nth-child(4) { height: 16px; }
+
+/* online — all bars green */
+.css-server-row.is-online    .css-bar { background: var(--cg); box-shadow: 0 0 4px var(--cg-glow); }
+/* maintenance — 1 bar red */
+.css-server-row.is-maintenance .css-bar:nth-child(1) { background: var(--cr); box-shadow: 0 0 4px var(--cr-glow); }
+.css-server-row.is-maintenance .css-bar:nth-child(2),
+.css-server-row.is-maintenance .css-bar:nth-child(3),
+.css-server-row.is-maintenance .css-bar:nth-child(4) { background: rgba(255,255,255,.1); }
+
+/* live pulse dot on online rows */
+.css-srv-name .css-live-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--cg);
+  box-shadow: 0 0 8px var(--cg-glow);
+  flex-shrink: 0;
+  animation: css-dot-pulse 2s ease-in-out infinite;
+}
+.is-maintenance .css-live-dot {
+  background: var(--cr);
+  box-shadow: 0 0 8px var(--cr-glow);
+  animation-duration: .8s;
+}
+@keyframes css-dot-pulse {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: .4; transform: scale(.7); }
+}
+
+/* ══════════════════════════════════════════════════════
+   SCROLL REVEAL
+══════════════════════════════════════════════════════ */
+.css-reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity .6s var(--ease), transform .6s var(--ease);
+}
+.css-reveal.css-from-left  { transform: translateX(-28px); }
+.css-reveal.css-from-right { transform: translateX(28px); }
+.css-reveal.in-view { opacity: 1; transform: translate(0,0); }
+
+.css-d1 { transition-delay: .04s; }
+.css-d2 { transition-delay: .10s; }
+.css-d3 { transition-delay: .16s; }
+.css-d4 { transition-delay: .22s; }
+.css-d5 { transition-delay: .28s; }
+.css-d6 { transition-delay: .08s; }
+.css-d7 { transition-delay: .16s; }
+.css-d8 { transition-delay: .24s; }
+.css-d9 { transition-delay: .32s; }
+
+/* ══════════════════════════════════════════════════════
+   TABLET ≤ 1100px
+══════════════════════════════════════════════════════ */
+@media (max-width: 1100px) {
+  .css-inner {
+    grid-template-columns: 200px 240px 1fr;
+  }
+  .css-table-col { padding-right: 180px; }
+  .css-char-panel { width: 160px; }
+}
+
+/* ══════════════════════════════════════════════════════
+   TABLET ≤ 860px
+══════════════════════════════════════════════════════ */
+@media (max-width: 860px) {
+  .css-inner {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+  }
+  .css-img-panel {
+    display: none;
+  }
+  .css-center {
+    border-right: none;
+    border-bottom: 1px solid var(--cborder);
+    padding: 28px 22px;
+    background: linear-gradient(
+      to bottom,
+      rgba(220,15,15,.08) 0%,
+      transparent 100%
+    );
+  }
+  .css-center::before { display: none; }
+  .css-table-col {
+    padding: 24px 22px 90px;
+    padding-right: 22px;
+  }
+  .css-char-panel {
+    width: 140px;
+    bottom: 0;
+    right: 0;
+    top: auto;
+    height: 180px;
+  }
+  .css-char-panel img {
+    height: 100%;
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   MOBILE ≤ 540px
+══════════════════════════════════════════════════════ */
+@media (max-width: 540px) {
+  .css-table-head { display: none; }
+  .css-server-row {
+    grid-template-columns: 1fr auto auto;
+    grid-template-rows: auto auto;
+  }
+  .css-srv-name  { grid-column: 1; grid-row: 1; }
+  .css-status    { grid-column: 2; grid-row: 1; font-size: 11px; }
+  .css-players   { grid-column: 1; grid-row: 2; font-size: 11px; }
+  .css-signal    { grid-column: 3; grid-row: 1 / 3; align-self: center; }
+  .css-char-panel { display: none; }
+  .css-table-col { padding-bottom: 28px; }
+}
+
+/* ══════════════════════════════════════════════════════
+   REDUCED MOTION
+══════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .css-reveal { opacity: 1; transform: none; transition: none; }
+  .css-live-dot { animation: none; }
+}
+</style>
+
+<section id="css-{{ section.id }}" aria-label="Server Status">
+  <div class="css-noise" aria-hidden="true"></div>
+
+  <div class="css-inner">
+
+    <!-- ══ LEFT IMAGE ══ -->
+    <div class="css-img-panel" aria-hidden="true">
+      {%- if section.settings.bg_image != blank -%}
+        <img
+          src="{{ section.settings.bg_image | image_url: width: 600 }}"
+          alt=""
+          loading="lazy"
+          draggable="false">
+      {%- else -%}
+        <!-- fallback dark gradient -->
+        <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(220,15,15,.35) 0%,#0d0008 70%);"></div>
+      {%- endif -%}
+    </div>
+
+    <!-- ══ CENTER INFO ══ -->
+    <div class="css-center">
+
+      {%- if section.settings.tag != blank -%}
+        <span class="css-tag css-reveal css-from-left css-d1">
+          {{ section.settings.tag }}
+        </span>
+      {%- endif -%}
+
+      {%- if section.settings.headline != blank -%}
+        <h2 class="css-headline css-reveal css-from-left css-d2">
+          {{- section.settings.headline | newline_to_br -}}
+        </h2>
+      {%- endif -%}
+
+      {%- if section.settings.body_text != blank -%}
+        <p class="css-body css-reveal css-from-left css-d3">
+          {{ section.settings.body_text }}
+        </p>
+      {%- endif -%}
+
+      {%- if section.settings.btn_label != blank -%}
+        <a href="{{ section.settings.btn_url | default: '#' }}"
+           class="css-btn css-reveal css-from-left css-d4">
+          {{ section.settings.btn_label }}
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M1 6H11M11 6L7 2M11 6L7 10"
+              stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </a>
+      {%- endif -%}
+
+    </div>
+
+    <!-- ══ SERVER TABLE ══ -->
+    <div class="css-table-col">
+
+      <!-- table header -->
+      <div class="css-table-head css-reveal css-d6">
+        <span class="css-th">Server</span>
+        <span class="css-th">Status</span>
+        <span class="css-th">Players</span>
+        <span class="css-th"></span>
+      </div>
+
+      <!-- server rows from blocks -->
+      {%- assign delay_i = 7 -%}
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'server' -%}
+          {%- assign status_val = block.settings.status | downcase -%}
+          {%- assign row_class = 'is-online' -%}
+          {%- if status_val == 'maintenance' -%}{%- assign row_class = 'is-maintenance' -%}{%- endif -%}
+          {%- if status_val == 'offline' -%}{%- assign row_class = 'is-offline' -%}{%- endif -%}
+
+          {%- assign status_label = 'Online' -%}
+          {%- if status_val == 'maintenance' -%}{%- assign status_label = 'Maintenance' -%}{%- endif -%}
+          {%- if status_val == 'offline' -%}{%- assign status_label = 'Offline' -%}{%- endif -%}
+
+          {%- assign delay_class = 'css-d' | append: delay_i -%}
+          {%- if delay_i < 9 -%}{%- assign delay_i = delay_i | plus: 1 -%}{%- endif -%}
+
+          <div class="css-server-row {{ row_class }} css-reveal {{ delay_class }}"
+               {{ block.shopify_attributes }}>
+
+            <div class="css-srv-name">
+              <span class="css-live-dot" aria-hidden="true"></span>
+              {{ block.settings.name }}
+            </div>
+
+            <span class="css-status {{ status_val }}">{{ status_label }}</span>
+
+            <span class="css-players">
+              <strong>{{ block.settings.players_current | default: '0' }}</strong>
+              / {{ block.settings.players_max | default: '2000' }}
+            </span>
+
+            <div class="css-signal" aria-hidden="true">
+              <div class="css-bar"></div>
+              <div class="css-bar"></div>
+              <div class="css-bar"></div>
+              <div class="css-bar"></div>
+            </div>
+
+          </div>
+
+        {%- endif -%}
+      {%- endfor -%}
+
+      {%- if section.blocks.size == 0 and request.design_mode -%}
+        <div style="padding:20px;font-family:monospace;color:rgba(220,15,15,.7);font-size:12px;">
+          Add Server blocks to display rows.
+        </div>
+      {%- endif -%}
+
+    </div>
+
+  </div>
+
+  <!-- CHARACTER IMAGE — absolute right edge -->
+  {%- if section.settings.character_image != blank -%}
+    <div class="css-char-panel" aria-hidden="true">
+      <img
+        src="{{ section.settings.character_image | image_url: width: 500 }}"
+        alt=""
+        loading="lazy"
+        draggable="false">
+    </div>
+  {%- endif -%}
+
+</section>
+
+<script>
+(function () {
+'use strict';
+var SID = '{{ section.id }}';
+
+function boot() {
+  var section = document.getElementById('css-' + SID);
+  if (!section) return;
+
+  /* ── SCROLL REVEAL ── */
+  var items = section.querySelectorAll('.css-reveal');
+
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) {
+          en.target.classList.add('in-view');
+          io.unobserve(en.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+    items.forEach(function (el) { io.observe(el); });
+  } else {
+    items.forEach(function (el) { el.classList.add('in-view'); });
+  }
+
+  /* ── LIVE PLAYER COUNT TICK ──────────────────────────
+     Simulates slight fluctuation on online server counts
+     so the numbers feel "live". Replace with real API
+     data by posting to the data-current attribute.
+  ─────────────────────────────────────────────────────*/
+  var rows = section.querySelectorAll('.css-server-row.is-online');
+  rows.forEach(function (row) {
+    var playerEl = row.querySelector('.css-players strong');
+    if (!playerEl) return;
+    var base = parseInt(playerEl.textContent, 10) || 0;
+    if (!base) return;
+    setInterval(function () {
+      var delta = Math.floor(Math.random() * 7) - 3; /* ±3 */
+      var next  = Math.max(0, base + delta);
+      playerEl.textContent = next;
+      base = next;
+    }, 4000);
+  });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', boot);
+} else {
+  boot();
+}
+if (window.Shopify && Shopify.designMode) {
+  document.addEventListener('shopify:section:load', function (e) {
+    if (e.detail.sectionId === SID) boot();
+  });
+}
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Cyber Server Status",
+  "tag": "div",
+  "class": "cyber-server-wrapper",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Left Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "bg_image",
+      "label": "Background / Scene Image",
+      "info": "Dark atmospheric image recommended. Shown on left panel."
+    },
+    {
+      "type": "image_picker",
+      "id": "character_image",
+      "label": "Character Image (Right Edge)",
+      "info": "PNG with transparent background. Positioned on far right."
+    },
+    {
+      "type": "header",
+      "content": "Center Text"
+    },
+    {
+      "type": "text",
+      "id": "tag",
+      "label": "Tag / Badge",
+      "default": "Server Status"
+    },
+    {
+      "type": "textarea",
+      "id": "headline",
+      "label": "Headline",
+      "info": "Use <em class=\"red\">WORD</em> to make text red.",
+      "default": "LIVE SERVER\n<em class=\"red\">STATUS</em>"
+    },
+    {
+      "type": "textarea",
+      "id": "body_text",
+      "label": "Body Text",
+      "default": "Real-time updates on all servers."
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "VIEW ALL SERVERS"
+    },
+    {
+      "type": "url",
+      "id": "btn_url",
+      "label": "Button Link"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "server",
+      "name": "Server Row",
+      "settings": [
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Server Name",
+          "default": "NEXUS CORE"
+        },
+        {
+          "type": "select",
+          "id": "status",
+          "label": "Status",
+          "default": "online",
+          "options": [
+            { "value": "online",      "label": "Online"      },
+            { "value": "maintenance", "label": "Maintenance" },
+            { "value": "offline",     "label": "Offline"     }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "players_current",
+          "label": "Current Players",
+          "default": "1245"
+        },
+        {
+          "type": "text",
+          "id": "players_max",
+          "label": "Max Players",
+          "default": "2000"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Cyber Server Status",
+      "blocks": [
+        {
+          "type": "server",
+          "settings": {
+            "name": "NEXUS CORE",
+            "status": "online",
+            "players_current": "1245",
+            "players_max": "2000"
+          }
+        },
+        {
+          "type": "server",
+          "settings": {
+            "name": "RISING DAWN",
+            "status": "online",
+            "players_current": "980",
+            "players_max": "2000"
+          }
+        },
+        {
+          "type": "server",
+          "settings": {
+            "name": "SHADOW REALM",
+            "status": "online",
+            "players_current": "856",
+            "players_max": "2000"
+          }
+        },
+        {
+          "type": "server",
+          "settings": {
+            "name": "ETERNAL WAR",
+            "status": "maintenance",
+            "players_current": "0",
+            "players_max": "2000"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

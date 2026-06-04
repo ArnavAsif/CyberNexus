@@ -1,0 +1,947 @@
+{%- comment -%}
+=======================================================
+  CYBER ABOUT — sections/cyber-about.liquid
+  v3 — Full cyber aesthetic, working video, animations
+=======================================================
+{%- endcomment -%}
+
+<style>
+/* ══════════════════════════════════════════════════════
+   TOKENS
+══════════════════════════════════════════════════════ */
+#cab-{{ section.id }} {
+  --cr:       #dc0f0f;
+  --cr-dim:   rgba(220,15,15,.15);
+  --cr-glow:  rgba(220,15,15,.5);
+  --cw:       #ffffff;
+  --cb:       #f2f2f2;
+  --cdark:    #0d0d0d;
+  --cgray:    #888;
+  --fh:       'Orbitron', monospace;
+  --fb:       'Rajdhani', sans-serif;
+  --ease:     cubic-bezier(.16,1,.3,1);
+  --ease2:    cubic-bezier(.4,0,.2,1);
+}
+
+/* ══════════════════════════════════════════════════════
+   SECTION WRAPPER
+══════════════════════════════════════════════════════ */
+#cab-{{ section.id }} {
+  position: relative;
+  width: 100%;
+  background: #f0f0f0;
+  overflow: hidden;
+  padding: 100px 0;
+  font-family: var(--fb);
+}
+
+/* top + bottom border accent */
+#cab-{{ section.id }}::before,
+#cab-{{ section.id }}::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(220,15,15,.4) 20%,
+    rgba(220,15,15,.7) 50%,
+    rgba(220,15,15,.4) 80%,
+    transparent 100%
+  );
+}
+#cab-{{ section.id }}::before { top: 0; }
+#cab-{{ section.id }}::after  { bottom: 0; }
+
+/* ── GRID ── */
+.cab-inner {
+  max-width: 1760px;
+  margin: 0 auto;
+  padding: 0 60px;
+  display: grid;
+  grid-template-columns: 380px 1fr 300px;
+  gap: 60px;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+/* background grid texture */
+#cab-{{ section.id }} .cab-grid-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: .04;
+  background-image:
+    linear-gradient(rgba(220,15,15,1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(220,15,15,1) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+}
+
+/* ══════════════════════════════════════════════════════
+   LEFT COLUMN
+══════════════════════════════════════════════════════ */
+.cab-left {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: relative;
+}
+
+/* vertical red bar accent */
+.cab-left::before {
+  content: '';
+  position: absolute;
+  left: -24px;
+  top: 0; bottom: 0;
+  width: 2px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--cr) 30%,
+    var(--cr) 70%,
+    transparent
+  );
+  opacity: .5;
+}
+
+/* tag */
+.cab-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--fh);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--cr);
+}
+.cab-tag::before {
+  content: '';
+  width: 20px; height: 1.5px;
+  background: var(--cr);
+  box-shadow: 0 0 8px var(--cr-glow);
+  flex-shrink: 0;
+  display: block;
+}
+
+/* headline */
+.cab-headline {
+  font-family: var(--fh);
+  font-size: clamp(26px, 3vw, 44px);
+  font-weight: 900;
+  line-height: 1.0;
+  letter-spacing: -.01em;
+  text-transform: uppercase;
+  color: var(--cdark);
+  margin: 0;
+}
+.cab-headline .red {
+  color: var(--cr);
+  display: block;
+  text-shadow: 0 0 40px rgba(220,15,15,.15);
+}
+
+/* body */
+.cab-body {
+  font-family: var(--fb);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.7;
+  color: rgba(20,20,20,.65);
+  margin: 0;
+  max-width: 320px;
+}
+
+/* stat row */
+.cab-stats {
+  display: flex;
+  gap: 24px;
+  margin-top: 4px;
+}
+.cab-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-left: 12px;
+  border-left: 2px solid var(--cr);
+}
+.cab-stat-num {
+  font-family: var(--fh);
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--cdark);
+  letter-spacing: -.02em;
+  line-height: 1;
+}
+.cab-stat-label {
+  font-family: var(--fb);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--cgray);
+}
+
+/* CTA button — matches hero section style */
+.cab-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: fit-content;
+  padding: 16px 36px;
+  background: var(--cdark);
+  color: var(--cw);
+  font-family: var(--fh);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  transition: background .35s, color .35s, box-shadow .35s;
+  margin-top: 8px;
+}
+.cab-btn:hover {
+  background: var(--cr);
+  box-shadow: 0 0 30px var(--cr-glow);
+}
+.cab-btn::before {
+  content: '';
+  position: absolute;
+  top: -4px; left: -4px;
+  width: 14px; height: 14px;
+  border-top: 2px solid var(--cr);
+  border-left: 2px solid var(--cr);
+  opacity: 0;
+  transition: opacity .3s;
+}
+.cab-btn:hover::before { opacity: 1; }
+.cab-btn svg { flex-shrink: 0; transition: transform .3s; }
+.cab-btn:hover svg { transform: translateX(4px); }
+
+/* ══════════════════════════════════════════════════════
+   CENTER — VIDEO
+══════════════════════════════════════════════════════ */
+.cab-video-col {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* outer glow ring */
+.cab-video-col::before {
+  content: '';
+  position: absolute;
+  inset: -16px;
+  border: 1px solid rgba(220,15,15,.18);
+  clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+  pointer-events: none;
+  z-index: 0;
+  animation: cab-ring-pulse 3s ease-in-out infinite;
+}
+@keyframes cab-ring-pulse {
+  0%,100% { border-color: rgba(220,15,15,.18); }
+  50%      { border-color: rgba(220,15,15,.45); }
+}
+
+.cab-video-wrap {
+  position: relative;
+  width: 100%;
+  /* TALL video box */
+  aspect-ratio: 4 / 3;
+  clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px));
+  overflow: hidden;
+  background: #111;
+  z-index: 1;
+  box-shadow:
+    0 32px 80px rgba(0,0,0,.25),
+    0 0 0 1px rgba(220,15,15,.25),
+    inset 0 0 60px rgba(0,0,0,.3);
+}
+
+/* corner accent squares */
+.cab-video-wrap .cab-corner {
+  position: absolute;
+  width: 18px; height: 18px;
+  z-index: 6;
+  pointer-events: none;
+}
+.cab-corner--tl { top: 6px;  left: 6px;  border-top: 2px solid var(--cr); border-left: 2px solid var(--cr); }
+.cab-corner--tr { top: 6px;  right: 6px; border-top: 2px solid var(--cr); border-right: 2px solid var(--cr); }
+.cab-corner--bl { bottom: 6px; left: 6px;  border-bottom: 2px solid var(--cr); border-left: 2px solid var(--cr); }
+.cab-corner--br { bottom: 6px; right: 6px;  border-bottom: 2px solid var(--cr); border-right: 2px solid var(--cr); }
+
+/* scan line sweep animation */
+.cab-video-wrap::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(220,15,15,.6), transparent);
+  z-index: 5;
+  pointer-events: none;
+  animation: cab-scan 4s linear infinite;
+  opacity: .6;
+}
+@keyframes cab-scan {
+  from { top: -2px; }
+  to   { top: 100%; }
+}
+
+/* bottom red glow */
+.cab-video-wrap::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 40%;
+  background: linear-gradient(to top, rgba(220,15,15,.15), transparent);
+  z-index: 4;
+  pointer-events: none;
+}
+
+/* VIDEO ELEMENT */
+.cab-video-el {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  z-index: 1;
+}
+
+/* POSTER */
+.cab-poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  z-index: 2;
+  transition: opacity .6s ease;
+}
+.cab-poster.hide { opacity: 0; pointer-events: none; }
+
+/* HUD overlay */
+.cab-video-hud {
+  position: absolute;
+  bottom: 12px; left: 14px;
+  z-index: 7;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  pointer-events: none;
+}
+.cab-hud-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--cr);
+  animation: cab-blink 1.4s ease-in-out infinite;
+}
+@keyframes cab-blink {
+  0%,100% { opacity: 1; }
+  50%      { opacity: .2; }
+}
+.cab-hud-label {
+  font-family: var(--fh);
+  font-size: 7px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.7);
+}
+
+/* ══════════════════════════════════════════════════════
+   RIGHT — FEATURES
+══════════════════════════════════════════════════════ */
+.cab-features {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.cab-feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 24px 0;
+  position: relative;
+  transition: background .3s;
+}
+/* divider line */
+.cab-feature + .cab-feature::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(220,15,15,.3), rgba(0,0,0,.08), transparent);
+}
+
+/* icon box */
+.cab-feat-icon {
+  flex-shrink: 0;
+  width: 46px; height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cr);
+  border: 1.5px solid rgba(220,15,15,.3);
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  background: rgba(220,15,15,.06);
+  transition: background .3s, border-color .3s, box-shadow .3s;
+}
+.cab-feature:hover .cab-feat-icon {
+  background: rgba(220,15,15,.15);
+  border-color: var(--cr);
+  box-shadow: 0 0 20px var(--cr-glow);
+}
+
+.cab-feat-body { display: flex; flex-direction: column; gap: 5px; padding-top: 2px; }
+
+.cab-feat-title {
+  font-family: var(--fh);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--cdark);
+  margin: 0;
+  transition: color .3s;
+}
+.cab-feature:hover .cab-feat-title { color: var(--cr); }
+
+.cab-feat-desc {
+  font-family: var(--fb);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.55;
+  color: rgba(20,20,20,.6);
+  margin: 0;
+}
+
+/* ══════════════════════════════════════════════════════
+   SCROLL ANIMATIONS
+══════════════════════════════════════════════════════ */
+.cab-reveal {
+  opacity: 0;
+  transform: translateY(36px);
+  transition:
+    opacity .7s var(--ease),
+    transform .7s var(--ease);
+}
+.cab-reveal.cab-from-left  { transform: translateX(-40px); }
+.cab-reveal.cab-from-right { transform: translateX(40px); }
+.cab-reveal.in-view {
+  opacity: 1;
+  transform: translate(0, 0);
+}
+
+.cab-reveal-d1 { transition-delay: .05s; }
+.cab-reveal-d2 { transition-delay: .12s; }
+.cab-reveal-d3 { transition-delay: .19s; }
+.cab-reveal-d4 { transition-delay: .26s; }
+.cab-reveal-d5 { transition-delay: .33s; }
+.cab-reveal-d6 { transition-delay: .08s; }
+.cab-reveal-d7 { transition-delay: .20s; }
+.cab-reveal-d8 { transition-delay: .32s; }
+
+/* ══════════════════════════════════════════════════════
+   TABLET  ≤ 1100px
+══════════════════════════════════════════════════════ */
+@media (max-width: 1100px) {
+  .cab-inner {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 48px;
+    padding: 0 40px;
+  }
+  .cab-left        { grid-column: 1; grid-row: 1; }
+  .cab-features    { grid-column: 2; grid-row: 1; }
+  .cab-video-col   { grid-column: 1 / -1; grid-row: 2; max-width: 640px; margin: 0 auto; width: 100%; }
+}
+
+/* ══════════════════════════════════════════════════════
+   MOBILE  ≤ 680px
+══════════════════════════════════════════════════════ */
+@media (max-width: 680px) {
+  #cab-{{ section.id }} { padding: 64px 0; }
+  .cab-inner {
+    grid-template-columns: 1fr;
+    gap: 36px;
+    padding: 0 22px;
+  }
+  .cab-left      { grid-column: 1; grid-row: 1; }
+  .cab-video-col { grid-column: 1; grid-row: 2; }
+  .cab-features  { grid-column: 1; grid-row: 3; }
+  .cab-body      { max-width: 100%; }
+  .cab-headline  { font-size: clamp(24px, 8vw, 38px); }
+  .cab-stats     { flex-wrap: wrap; gap: 16px; }
+  .cab-video-wrap { aspect-ratio: 4 / 3; }
+  .cab-left::before { display: none; }
+}
+
+/* ══════════════════════════════════════════════════════
+   REDUCED MOTION
+══════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .cab-reveal { opacity: 1; transform: none; transition: none; }
+  .cab-video-wrap::before { animation: none; }
+  .cab-video-col::before  { animation: none; }
+  .cab-hud-dot { animation: none; }
+}
+</style>
+
+<section id="cab-{{ section.id }}" aria-label="About section">
+  <!-- bg grid texture -->
+  <div class="cab-grid-bg" aria-hidden="true"></div>
+
+  <div class="cab-inner">
+
+    <!-- ═══════════ LEFT ═══════════ -->
+    <div class="cab-left">
+
+      {%- if section.settings.tag != blank -%}
+        <span class="cab-tag cab-reveal cab-from-left cab-reveal-d1">
+          {{ section.settings.tag }}
+        </span>
+      {%- endif -%}
+
+      {%- if section.settings.headline != blank -%}
+        <h2 class="cab-headline cab-reveal cab-from-left cab-reveal-d2">
+          {{- section.settings.headline | newline_to_br -}}
+        </h2>
+      {%- endif -%}
+
+      {%- if section.settings.body_text != blank -%}
+        <p class="cab-body cab-reveal cab-from-left cab-reveal-d3">
+          {{ section.settings.body_text }}
+        </p>
+      {%- endif -%}
+
+      {%- if section.settings.stat_1_num != blank or section.settings.stat_2_num != blank -%}
+        <div class="cab-stats cab-reveal cab-from-left cab-reveal-d4">
+          {%- if section.settings.stat_1_num != blank -%}
+            <div class="cab-stat">
+              <span class="cab-stat-num">{{ section.settings.stat_1_num }}</span>
+              <span class="cab-stat-label">{{ section.settings.stat_1_label }}</span>
+            </div>
+          {%- endif -%}
+          {%- if section.settings.stat_2_num != blank -%}
+            <div class="cab-stat">
+              <span class="cab-stat-num">{{ section.settings.stat_2_num }}</span>
+              <span class="cab-stat-label">{{ section.settings.stat_2_label }}</span>
+            </div>
+          {%- endif -%}
+          {%- if section.settings.stat_3_num != blank -%}
+            <div class="cab-stat">
+              <span class="cab-stat-num">{{ section.settings.stat_3_num }}</span>
+              <span class="cab-stat-label">{{ section.settings.stat_3_label }}</span>
+            </div>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+      {%- if section.settings.btn_label != blank -%}
+        <a href="{{ section.settings.btn_url | default: '#' }}"
+           class="cab-btn cab-reveal cab-from-left cab-reveal-d5">
+          {{ section.settings.btn_label }}
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+            <path d="M1 6.5H12M12 6.5L7.5 2M12 6.5L7.5 11"
+              stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </a>
+      {%- endif -%}
+
+    </div>
+
+    <!-- ═══════════ CENTER VIDEO ═══════════ -->
+    <div class="cab-video-col">
+      <div class="cab-video-wrap cab-reveal cab-reveal-d6"
+           id="cab-wrap-{{ section.id }}">
+
+        <!-- Corner accents -->
+        <div class="cab-corner cab-corner--tl" aria-hidden="true"></div>
+        <div class="cab-corner cab-corner--tr" aria-hidden="true"></div>
+        <div class="cab-corner cab-corner--bl" aria-hidden="true"></div>
+        <div class="cab-corner cab-corner--br" aria-hidden="true"></div>
+
+        <!-- VIDEO — autoplay, muted, loop, no controls -->
+        {%- if section.settings.video_url != blank -%}
+          <video
+            id="cab-vid-{{ section.id }}"
+            class="cab-video-el"
+            autoplay
+            muted
+            loop
+            playsinline
+            preload="metadata"
+            disablepictureinpicture
+            disableremoteplayback>
+            <source src="{{ section.settings.video_url }}" type="video/mp4">
+          </video>
+        {%- endif -%}
+
+        <!-- Poster -->
+        {%- if section.settings.video_poster != blank -%}
+          <img
+            id="cab-poster-{{ section.id }}"
+            class="cab-poster"
+            src="{{ section.settings.video_poster | image_url: width: 900 }}"
+            alt=""
+            aria-hidden="true"
+            draggable="false"
+            loading="eager">
+        {%- endif -%}
+
+        <!-- HUD badge -->
+        <div class="cab-video-hud" aria-hidden="true">
+          <div class="cab-hud-dot"></div>
+          <span class="cab-hud-label">{{ section.settings.video_hud_label | default: 'LIVE PREVIEW' }}</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ═══════════ RIGHT FEATURES ═══════════ -->
+    <div class="cab-features">
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'feature' -%}
+          {%- assign d = 'cab-reveal-d6' -%}
+          {%- if forloop.index == 2 -%}{%- assign d = 'cab-reveal-d7' -%}{%- endif -%}
+          {%- if forloop.index == 3 -%}{%- assign d = 'cab-reveal-d8' -%}{%- endif -%}
+
+          <div class="cab-feature cab-reveal cab-from-right {{ d }}"
+               {{ block.shopify_attributes }}>
+
+            <div class="cab-feat-icon" aria-hidden="true">
+              {%- case block.settings.icon -%}
+                {%- when 'globe' -%}
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                       stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                  </svg>
+                {%- when 'community' -%}
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                       stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+                  </svg>
+                {%- when 'refresh' -%}
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                       stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="23 4 23 10 17 10"/>
+                    <polyline points="1 20 1 14 7 14"/>
+                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                  </svg>
+                {%- when 'shield' -%}
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                       stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                  </svg>
+                {%- when 'star' -%}
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                       stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                  </svg>
+                {%- when 'zap' -%}
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                       stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                  </svg>
+                {%- when 'target' -%}
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                       stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <circle cx="12" cy="12" r="6"/>
+                    <circle cx="12" cy="12" r="2"/>
+                  </svg>
+                {%- else -%}
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                       stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                  </svg>
+              {%- endcase -%}
+            </div>
+
+            <div class="cab-feat-body">
+              {%- if block.settings.title != blank -%}
+                <p class="cab-feat-title">{{ block.settings.title }}</p>
+              {%- endif -%}
+              {%- if block.settings.description != blank -%}
+                <p class="cab-feat-desc">{{ block.settings.description }}</p>
+              {%- endif -%}
+            </div>
+
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+
+  </div>
+</section>
+
+<script>
+(function () {
+'use strict';
+var SID = '{{ section.id }}';
+
+function boot() {
+  var section = document.getElementById('cab-' + SID);
+  if (!section) return;
+
+  /* ── VIDEO ──────────────────────────────────────────────
+     Pure HTML attributes handle autoplay (autoplay + muted
+     + playsinline). JS only hides the poster once playing.
+  ─────────────────────────────────────────────────────── */
+  var vid    = document.getElementById('cab-vid-'    + SID);
+  var poster = document.getElementById('cab-poster-' + SID);
+
+  if (vid) {
+    /* Ensure muted (some browsers strip the attribute) */
+    vid.muted  = true;
+    vid.volume = 0;
+
+    function hidePoster() {
+      if (poster) poster.classList.add('hide');
+    }
+
+    /* Try programmatic play as backup */
+    function tryPlay() {
+      var p = vid.play();
+      if (p && p.then) {
+        p.then(hidePoster).catch(function () {
+          /* Autoplay blocked — poster stays, no controls shown */
+        });
+      }
+    }
+
+    if (vid.readyState >= 3) {
+      tryPlay();
+    } else {
+      vid.addEventListener('canplay', tryPlay, { once: true });
+    }
+
+    vid.addEventListener('playing', hidePoster, { once: true });
+  }
+
+  /* ── SCROLL REVEAL ──────────────────────────────────── */
+  var items = section.querySelectorAll('.cab-reveal');
+
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) {
+          en.target.classList.add('in-view');
+          io.unobserve(en.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+    items.forEach(function (el) { io.observe(el); });
+  } else {
+    items.forEach(function (el) { el.classList.add('in-view'); });
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', boot);
+} else {
+  boot();
+}
+
+if (window.Shopify && Shopify.designMode) {
+  document.addEventListener('shopify:section:load', function (e) {
+    if (e.detail.sectionId === SID) boot();
+  });
+}
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Cyber About",
+  "tag": "div",
+  "class": "cyber-about-wrapper",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Left Column"
+    },
+    {
+      "type": "text",
+      "id": "tag",
+      "label": "Tag / Badge",
+      "default": "About CyberNexus"
+    },
+    {
+      "type": "textarea",
+      "id": "headline",
+      "label": "Headline",
+      "info": "Wrap any word in <em class=\"red\">WORD</em> to make it red.",
+      "default": "BUILT FOR\n<em class=\"red\">WARRIORS.</em>\nDESIGNED FOR\n<em class=\"red\">LEGENDS.</em>"
+    },
+    {
+      "type": "textarea",
+      "id": "body_text",
+      "label": "Body Text",
+      "default": "CyberNexus is more than a game. It's a world where warriors, legends, and futures collide."
+    },
+    {
+      "type": "header",
+      "content": "Stats"
+    },
+    {
+      "type": "text",
+      "id": "stat_1_num",
+      "label": "Stat 1 Number",
+      "default": "500K+"
+    },
+    {
+      "type": "text",
+      "id": "stat_1_label",
+      "label": "Stat 1 Label",
+      "default": "Players"
+    },
+    {
+      "type": "text",
+      "id": "stat_2_num",
+      "label": "Stat 2 Number",
+      "default": "120+"
+    },
+    {
+      "type": "text",
+      "id": "stat_2_label",
+      "label": "Stat 2 Label",
+      "default": "Missions"
+    },
+    {
+      "type": "text",
+      "id": "stat_3_num",
+      "label": "Stat 3 Number",
+      "default": "4.9★"
+    },
+    {
+      "type": "text",
+      "id": "stat_3_label",
+      "label": "Stat 3 Label",
+      "default": "Rating"
+    },
+    {
+      "type": "header",
+      "content": "Button"
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "LEARN MORE"
+    },
+    {
+      "type": "url",
+      "id": "btn_url",
+      "label": "Button Link"
+    },
+    {
+      "type": "header",
+      "content": "Video"
+    },
+    {
+      "type": "text",
+      "id": "video_url",
+      "label": "Video URL (MP4)",
+      "info": "Paste a direct .mp4 link from Shopify Files or any CDN. The video will autoplay silently with no controls."
+    },
+    {
+      "type": "image_picker",
+      "id": "video_poster",
+      "label": "Video Poster Image",
+      "info": "Shown before video loads."
+    },
+    {
+      "type": "text",
+      "id": "video_hud_label",
+      "label": "Video HUD Label",
+      "default": "LIVE PREVIEW"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "Feature Item",
+      "limit": 4,
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "default": "globe",
+          "options": [
+            { "value": "globe",     "label": "Globe"       },
+            { "value": "community", "label": "Community"   },
+            { "value": "refresh",   "label": "Refresh"     },
+            { "value": "shield",    "label": "Shield"      },
+            { "value": "star",      "label": "Star"        },
+            { "value": "zap",       "label": "Lightning"   },
+            { "value": "target",    "label": "Target"      }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "EPIC WORLD"
+        },
+        {
+          "type": "text",
+          "id": "description",
+          "label": "Description",
+          "default": "A vast universe filled with mystery and adventure."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Cyber About",
+      "blocks": [
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "globe",
+            "title": "EPIC WORLD",
+            "description": "A vast universe filled with mystery and adventure."
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "community",
+            "title": "STRONG COMMUNITY",
+            "description": "Thousands of players. One unstoppable force."
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "refresh",
+            "title": "CONSTANT EVOLUTION",
+            "description": "Regular updates and exciting new content."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
